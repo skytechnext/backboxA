@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Black Box — Casa Escondida Odoo Build Engine</title>
+<title>The Black Box — Multi-Project Build Engine</title>
 <style>
   :root{
     --bg:#0b0f14; --panel:#121821; --panel2:#161e29; --line:#243040;
@@ -24,7 +24,7 @@
   h1{font-size:clamp(30px,5vw,50px);margin:18px 0 8px;letter-spacing:-.02em;line-height:1.05}
   h1 .bx{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;
          background-clip:text;color:transparent}
-  .lede{font-size:18px;color:var(--muted);max-width:760px}
+  .lede{font-size:18px;color:var(--muted);max-width:780px}
   section{padding:42px 0;border-bottom:1px solid var(--line)}
   h2{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
      font-family:var(--mono);margin:0 0 6px}
@@ -40,33 +40,31 @@
         border:1px solid var(--line);color:var(--muted);background:var(--panel2)}
   code{font-family:var(--mono);font-size:.9em;background:rgba(110,168,254,.10);
        border:1px solid rgba(110,168,254,.18);padding:1px 6px;border-radius:5px;color:#cfe0ff}
-  /* runtime banner */
   .runtime{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
   @media(max-width:760px){.runtime{grid-template-columns:1fr}}
   .runtime .col{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
   .runtime .det{border-left:3px solid var(--good)} .runtime .rea{border-left:3px solid var(--accent2)}
   .plus{display:flex;align-items:center;justify-content:center;font:700 28px var(--mono);color:var(--muted)}
-  /* stages */
-  .stage{display:grid;grid-template-columns:46px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
+  .flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:6px 0 0;font:600 13px var(--mono);color:var(--muted)}
+  .flow b{color:var(--ink);font-weight:600} .flow .arr{color:var(--accent)}
+  .stage{display:grid;grid-template-columns:54px 1fr;gap:14px;padding:14px 0;border-top:1px solid var(--line)}
   .stage:first-child{border-top:0}
-  .num{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;
-       font:700 16px var(--mono);background:var(--panel2);border:1px solid var(--line);color:var(--accent)}
+  .num{min-width:48px;height:30px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+       font:700 13px var(--mono);background:var(--panel2);border:1px solid var(--line);color:var(--accent)}
   .stage h4{margin:0 0 3px;font-size:15px}
   .stage .do{color:var(--muted);font-size:14px;margin:0 0 8px}
   .verify{font:600 12.5px/1.4 var(--mono);color:var(--good);background:rgba(84,209,140,.07);
           border:1px solid rgba(84,209,140,.2);padding:7px 10px;border-radius:8px;display:inline-block}
   .verify::before{content:"VERIFY  ";color:var(--muted)}
-  /* loops table */
   table{width:100%;border-collapse:collapse;font-size:14px}
   th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
   th{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
   td code{white-space:nowrap}
   .lk{color:var(--muted);font-size:13px}
-  /* counts */
   .counts{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
   @media(max-width:760px){.counts{grid-template-columns:repeat(2,1fr)}}
   .kpi{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
-  .kpi .v{font:700 22px var(--mono);color:var(--accent)} .kpi .k{font-size:12px;color:var(--muted);margin-top:3px}
+  .kpi .v{font:700 20px var(--mono);color:var(--accent)} .kpi .k{font-size:12px;color:var(--muted);margin-top:3px}
   pre{background:#0a0e13;border:1px solid var(--line);border-radius:12px;padding:16px;overflow:auto;
       font-family:var(--mono);font-size:13px;color:#cfe0ff;line-height:1.5}
   .cmd{color:var(--accent)} .cmt{color:var(--muted)}
@@ -78,6 +76,10 @@
   .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
   .links a{font:600 13px var(--mono);background:var(--panel2);border:1px solid var(--line);
            padding:7px 11px;border-radius:8px}
+  .tabs{display:flex;gap:8px;margin:0 0 16px}
+  .tabs button{font:600 13px var(--mono);background:var(--panel2);color:var(--muted);border:1px solid var(--line);
+               padding:8px 14px;border-radius:9px;cursor:pointer}
+  .tabs button.on{color:var(--bg);background:var(--accent);border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -86,34 +88,34 @@
   <header>
     <span class="tag">Codename · Black Box</span>
     <h1>The <span class="bx">Black Box</span> Engine</h1>
-    <p class="lede">A hybrid, multi-agent orchestration engine that autonomously builds the
-    <strong>Casa Escondida Anilao</strong> Odoo&nbsp;19 ERP from a machine-readable spec — running
-    deterministically with no API key, and adding an Anthropic reasoning layer when one is present.</p>
+    <p class="lede">A hybrid, multi-agent orchestration engine that turns a project's spec into its two
+    deliverables — a <strong>strategy website</strong> and a fully configured <strong>Odoo&nbsp;19 ERP</strong>.
+    It is <strong>project-agnostic</strong>: point it at any <code>projects/&lt;name&gt;/</code> and it builds.
+    Casa Escondida Anilao is the reference example, not the engine.</p>
     <div class="links">
       <a href="#runtime">Hybrid runtime</a>
-      <a href="#stages">9 stages</a>
+      <a href="#projects">Multi-project</a>
+      <a href="#pipelines">Pipelines</a>
       <a href="#loops">7 loops</a>
       <a href="#agents">Agents</a>
-      <a href="#counts">Targets</a>
       <a href="#cli">CLI</a>
     </div>
   </header>
 
   <section id="what">
     <h2>The idea</h2>
-    <div class="h2sub">A spec goes in. A fully populated ERP comes out.</div>
-    <p>Everything about the build lives as data in <code>odoo-build-spec/</code> — modules, the data model,
-    demo-data targets, automations, and the connection strategy. The engine reads that spec and drives a
-    real Odoo&nbsp;19 instance through nine ordered stages, checking a hard <strong>verification gate</strong>
-    after each one. It never invents facts the spec already states, never fakes a green gate, and re-runs
-    without creating duplicates.</p>
+    <div class="h2sub">A project spec goes in. A website and an ERP come out.</div>
+    <p>Everything project-specific — counts, personas, branding, copy, room/site data — lives as data under
+    <code>projects/&lt;name&gt;/</code>. The engine reads the <em>selected</em> project's spec and drives two
+    pipelines, checking a hard <strong>verification gate</strong> after every stage. Engine code holds
+    <strong>zero project facts</strong>: a new project builds with no code changes.</p>
     <div class="grid g3" style="margin-top:18px">
-      <div class="card"><h3>Deterministic core</h3><p>Runs the whole build with the standard library + the
-        Odoo XML-RPC client. No API key required.</p></div>
+      <div class="card"><h3>Deterministic core</h3><p>Runs both builds with the standard library + the Odoo
+        XML-RPC client and a local build/deploy. No API key required.</p></div>
       <div class="card"><h3>Reasoning layer</h3><p>When <code>ANTHROPIC_API_KEY</code> is set, an
-        Anthropic-SDK agent loop fixes gaps and composes realistic demo values.</p></div>
-      <div class="card"><h3>Idempotent</h3><p>Search-before-create on natural keys means every re-run
-        converges to the same state instead of duplicating it.</p></div>
+        Anthropic-SDK loop fixes gaps and grounds website copy via Corrective-RAG.</p></div>
+      <div class="card"><h3>Project-agnostic</h3><p>Counts and content come from the project spec; Casa
+        Escondida is one project among many.</p></div>
     </div>
   </section>
 
@@ -124,9 +126,9 @@
       <div class="col det">
         <span class="pill" style="color:var(--good);border-color:rgba(84,209,140,.35)">ALWAYS ON</span>
         <h3 style="margin:10px 0 6px">Deterministic harness</h3>
-        <p style="color:var(--muted);font-size:14px;margin:0">Sequences the 9 stages, runs every Odoo write
-        through idempotent tools, checks each verification gate, persists state, and resumes. Needs only
-        <code>ODOO_*</code> env vars — or nothing at all in <code>--dry-run</code>.</p>
+        <p style="color:var(--muted);font-size:14px;margin:0">Sequences each enabled pipeline's stages, runs
+        every write through idempotent tools, checks each gate, persists state, resumes. Needs only the
+        relevant env vars — or nothing at all in <code>--dry-run</code>.</p>
       </div>
       <div class="plus">+</div>
       <div class="col rea">
@@ -134,56 +136,56 @@
         <h3 style="margin:10px 0 6px">Anthropic reasoning layer</h3>
         <p style="color:var(--muted);font-size:14px;margin:0">A manual tool-use (ReAct) loop on
         <code>claude-opus-4-8</code> with adaptive thinking. Decides <em>how</em> to satisfy a gap and
-        composes demo values — but every write still flows through the same idempotent, gated tools.</p>
+        grounds copy — but every write still flows through the same idempotent, gated tools.</p>
       </div>
     </div>
-    <div class="note" style="margin-top:16px">Scope is locked to the <strong>Odoo-build half</strong>
-      (connect → install → configure → data → POS/booking → transactions → invoice/pay → automations → QA).
-      Website/strategy-site generation is out of scope.</div>
   </section>
 
-  <section id="stages">
-    <h2>The pipeline</h2>
-    <div class="h2sub">Nine stages, each with a non-negotiable verification gate</div>
+  <section id="projects">
+    <h2>Multi-project</h2>
+    <div class="h2sub">Engine vs. project — a strict separation</div>
+    <div class="grid g2">
+      <div class="card"><h3><code>blackbox/</code> — the engine</h3>
+        <p>Project-agnostic. Orchestrator, pipelines, loops, verification logic, connection tiers, tools.
+        No project facts live here.</p></div>
+      <div class="card"><h3><code>projects/&lt;name&gt;/</code> — the input</h3>
+        <p><code>project.json</code> (manifest + enabled deliverables), <code>odoo-build-spec/</code>,
+        <code>site-spec/</code>, and <code>inputs/</code>. Selected via <code>--project</code> /
+        <code>BLACKBOX_PROJECT</code>.</p></div>
+    </div>
+    <div class="flow"><b>projects/casa-escondida/</b> <span class="arr">→</span> <b>blackbox run</b>
+      <span class="arr">→</span> strategy website <span class="arr">+</span> Odoo&nbsp;19 ERP</div>
+    <div class="note" style="margin-top:16px">Acceptance bar: a second project added under
+      <code>projects/&lt;name&gt;/</code> builds with <strong>zero changes to <code>blackbox/</code></strong>.</div>
+  </section>
+
+  <section id="pipelines">
+    <h2>The pipelines</h2>
+    <div class="h2sub">Two deliverables, each gated stage-by-stage</div>
+    <div class="tabs">
+      <button id="tabOdoo" class="on" onclick="showPipe('odoo')">Odoo ERP · 9 stages</button>
+      <button id="tabSite" onclick="showPipe('site')">Website · 7 stages</button>
+    </div>
+    <p id="pipeNote" style="margin:0 0 14px;color:var(--muted);font-size:14px"></p>
     <div id="stageList"></div>
   </section>
 
   <section id="loops">
     <h2>Control loops</h2>
-    <div class="h2sub">Seven nested loops keep the build bounded and safe</div>
+    <div class="h2sub">Seven nested loops keep both builds bounded and safe</div>
     <table><thead><tr><th style="width:64px">Loop</th><th>Role</th><th>Where</th></tr></thead>
       <tbody id="loopRows"></tbody></table>
   </section>
 
   <section id="agents">
     <h2>Agent roster</h2>
-    <div class="h2sub">Six deterministic stage agents + one reasoning runtime</div>
+    <div class="h2sub">Deterministic stage agents across both pipelines + one reasoning runtime</div>
     <div class="grid g3" id="agentCards"></div>
   </section>
 
-  <section id="idem">
-    <h2>Idempotency &amp; ordering</h2>
-    <div class="h2sub">Why a re-run never duplicates</div>
-    <div class="grid g2">
-      <div class="card"><h3>Natural keys</h3>
-        <ul class="clean">
-          <li>Products → <code>default_code</code></li>
-          <li>Rooms → <code>stock.lot.name</code> (<code>STD-01</code>…)</li>
-          <li>Partners → <code>email</code> (fallback name + phone)</li>
-          <li>Sale orders → <code>client_order_ref</code> (<code>CE-&lt;channel&gt;-&lt;seq&gt;</code>)</li>
-        </ul></div>
-      <div class="card"><h3>Strict ordering</h3>
-        <p style="margin-bottom:8px">CoA + taxes → currencies → pricelists → partners → products →
-        resources → orders → confirm → invoice → register payment.</p>
-        <span class="verify" style="color:var(--warn);background:rgba(240,180,41,.07);border-color:rgba(240,180,41,.25)">Never invoice before CoA / taxes exist</span>
-        <p style="margin-top:10px">Two-pass confirm/post: create all drafts first, then confirm/post in a
-        separate, resumable pass.</p></div>
-    </div>
-  </section>
-
   <section id="counts">
-    <h2>Count targets</h2>
-    <div class="h2sub">Final QA must land within ±10% of these (from <code>demo-data.json</code>)</div>
+    <h2>Tracked counts</h2>
+    <div class="h2sub">Read from the selected project's spec — values shown are the Casa Escondida example (±10%)</div>
     <div class="counts" id="countGrid"></div>
   </section>
 
@@ -194,87 +196,118 @@
       <div class="card"><span class="pill">TIER 1</span><h3 style="margin:8px 0 4px">SSH</h3>
         <p>Odoo.sh via <code>ODOO_SH_HOST</code>. Used for custom-module deploy.</p></div>
       <div class="card"><span class="pill">TIER 2 · primary</span><h3 style="margin:8px 0 4px">API</h3>
-        <p>XML-RPC via <code>xmlrpc_client</code>. All data stages run here.</p></div>
+        <p>XML-RPC via <code>xmlrpc_client</code>. All ERP data stages run here.</p></div>
       <div class="card"><span class="pill">TIER 3</span><h3 style="margin:8px 0 4px">Browser</h3>
         <p>Last resort. Forced for SaaS "Install an Industry".</p></div>
     </div>
     <div class="note" style="margin-top:16px">Some prerequisites <strong>cannot</strong> be done over the
-      API (SaaS Hotel-industry activation; chart-of-accounts swap needing an empty-books window). The engine
-      detects their absence and <strong>reports</strong> them as manual steps — it does not fake them.</div>
+      API (SaaS industry activation; chart-of-accounts swap needing an empty-books window). The engine
+      detects their absence and <strong>reports</strong> them as manual steps — it does not fake them.
+      Website deploy target + credentials come from the project's <code>deploy.json</code> and env.</div>
   </section>
 
   <section id="cli">
     <h2>Command line</h2>
-    <div class="h2sub">Four verbs</div>
-<pre><span class="cmd">python -m blackbox probe</span>                       <span class="cmt"># probe connection, print recommended tier</span>
-<span class="cmd">python -m blackbox run</span> --dry-run               <span class="cmt"># full 9-stage build vs FakeOdoo (no net, no key)</span>
-<span class="cmd">python -m blackbox run</span> --from-stage 3 --yes    <span class="cmt"># live build; auto-approve non-destructive gates</span>
-<span class="cmd">python -m blackbox verify</span> --stage 7            <span class="cmt"># run one stage's verification gate</span>
-<span class="cmd">python -m blackbox report</span>                      <span class="cmt"># counts vs targets, deviations</span></pre>
+    <div class="h2sub">Project-scoped verbs</div>
+<pre><span class="cmd">python -m blackbox projects</span>                                  <span class="cmt"># list projects under projects/</span>
+<span class="cmd">python -m blackbox probe</span>  --project casa-escondida          <span class="cmt"># probe connection, print tier</span>
+<span class="cmd">python -m blackbox run</span>    --project casa-escondida --dry-run <span class="cmt"># both pipelines vs fakes (no net, no key)</span>
+<span class="cmd">python -m blackbox run</span>    --project casa-escondida --deliverable odoo --yes
+<span class="cmd">python -m blackbox verify</span> --project casa-escondida --stage 7
+<span class="cmd">python -m blackbox report</span> --project casa-escondida          <span class="cmt"># counts vs targets, deviations</span></pre>
   </section>
 
   <footer>
     <div class="h2sub" style="font-size:16px;color:var(--ink)">🔗 All links</div>
     <ul class="clean">
       <li>Build prompt: <code>BLACKBOX-BUILD-PROMPT.md</code></li>
-      <li>Conceptual model (canonical JS): <code>ai-blackbox.html</code> · spec: <code>agents/orchestration.md</code></li>
-      <li>Machine-readable spec: <code>odoo-build-spec/</code> (mcp-runbook, modules, data-model, demo-data, automations)</li>
-      <li>Proven history &amp; constraints: <code>BUILD-LOG.md</code> · conventions: <code>CLAUDE.md</code></li>
+      <li>Canonical model (two-deliverable): <code>ai-blackbox.html</code> · engine spec: <code>agents/orchestration.md</code></li>
+      <li>Per-project spec: <code>projects/&lt;name&gt;/</code> (project.json, odoo-build-spec, site-spec, inputs)</li>
+      <li>Reference example: <code>projects/casa-escondida/</code> · shared connectors: <code>connect/</code></li>
+      <li>Constraints &amp; history: <code>BUILD-LOG.md</code> · conventions: <code>CLAUDE.md</code></li>
     </ul>
-    <p style="margin-top:14px;font-size:12.5px">This explainer mirrors the
-    <code>AGENTS / LOOPS / STAGES / OPS / COUNT_KEYS</code> structure so code and narrative stay in sync.</p>
+    <p style="margin-top:14px;font-size:12.5px">Mirrors the
+    <code>AGENTS / LOOPS / STAGES / OPS / COUNT_KEYS</code> structure so code &amp; narrative stay in sync.</p>
   </footer>
 
 </div>
 
 <script>
 /* Canonical structures — mirror ai-blackbox.html so code & narrative stay in sync. */
-const STAGES = [
-  {n:0, t:"Connect & reset", do:"Probe/select tier; read res.company (expect Odoo 19); safely clear old demo data (gated).", v:"res.company ≥ 1; targeted demo-model counts = 0"},
-  {n:1, t:"Install modules", do:"Install modules.json install_order (13) + recommended_addons.", v:"every tech_name is installed"},
-  {n:2, t:"Company / tax / finance", do:"Company (Asia/Manila, PHP), 12% VAT taxes, journals, pricelists.", v:"sales VAT 12% exists; account.account > 50; ≥ 2 pricelists"},
-  {n:3, t:"Master data", do:"Persona tags, ~150 customers + OTA/agents, ~20 vendors, 8 departments, ~36 employees, ~35 dive sites.", v:"customers ≥ 150; employees ≥ 36; departments = 8"},
-  {n:4, t:"Products & rooms", do:"4 room types → 24 rooms; dive trips, courses, gear (+serials), consumables, F&B, retail.", v:"rooms = 24; product default_code prefixes present"},
-  {n:5, t:"POS & booking", do:"2 POS configs, payment methods incl. Room Charge, appointment types.", v:"2 POS configs; Room Charge method; ≥ 4 appointment types"},
-  {n:6, t:"Transactions (draft)", do:"Reservations, dives, courses, gear rentals, ~2000 POS, CRM leads/opps.", v:"sale.order ≥ 600; pos.order ≥ 1500; crm.lead ≥ 80"},
-  {n:7, t:"Confirm / invoice / pay", do:"Confirm SOs; post ~400 invoices + ~120 bills; register ~80% payments; close a POS session.", v:"posted invoices ≥ 350; payments registered; VAT report non-empty"},
-  {n:8, t:"Automations", do:"Native scheduled/server actions from automations.json; register AI hooks as docs.", v:"scheduled actions for pricing / overbooking guard / review request exist"},
-  {n:9, t:"Final QA", do:"Cross-module spot-checks; build report (counts vs targets, deviations).", v:"all stage gates green; counts within ±10% of demo-data.json targets"},
-];
+const STAGES = {
+  odoo: [
+    {n:"0", t:"Connect & reset", do:"Probe/select tier; read res.company (expect Odoo 19); safely clear old demo data (gated).", v:"res.company ≥ 1; targeted demo counts = 0"},
+    {n:"1", t:"Install modules", do:"Install modules.json install_order + recommended_addons.", v:"every tech_name installed"},
+    {n:"2", t:"Company / tax / finance", do:"Company (locale+currency from spec), VAT taxes, journals, pricelists.", v:"spec VAT exists; account.account > floor; ≥ spec pricelists"},
+    {n:"3", t:"Master data", do:"Persona tags, customers + channels, vendors, departments, employees, resources — to spec targets.", v:"counts ≥ spec targets"},
+    {n:"4", t:"Products & rooms", do:"Product/room catalogue per spec (room types → rooms; gear, F&B, retail).", v:"rooms = spec; default_code prefixes present"},
+    {n:"5", t:"POS & booking", do:"POS configs, payment methods, appointment types — per spec.", v:"POS configs = spec; required methods exist"},
+    {n:"6", t:"Transactions (draft)", do:"Bookings/services/rentals, POS orders, CRM leads/opps — to spec volumes.", v:"sale.order / pos.order / crm.lead ≥ spec"},
+    {n:"7", t:"Confirm / invoice / pay", do:"Confirm SOs; post invoices + bills; register payments; close a POS session.", v:"posted invoices ≥ floor; payments; VAT report non-empty"},
+    {n:"8", t:"Automations", do:"Native scheduled/server actions from automations.json; register AI hooks as docs.", v:"spec's required scheduled actions exist"},
+    {n:"9", t:"Final QA", do:"Cross-module spot-checks; build report (counts vs targets, deviations).", v:"all gates green; counts within ±10% of spec"},
+  ],
+  site: [
+    {n:"S0", t:"Ingest", do:"Load inputs/ + Drive content per content-sources.json.", v:"all declared sources resolved; manifest complete"},
+    {n:"S1", t:"Research / RAG", do:"Ground facts/claims from the sources (L5 Corrective-RAG).", v:"every required fact cited; no unsupported claims"},
+    {n:"S2", t:"Architecture", do:"Derive pages/sections from pages.json / sections.json.", v:"every required page/section planned"},
+    {n:"S3", t:"Content", do:"Copy within brand.json voice + source rules.", v:"each section has copy; no placeholder; brand voice applied"},
+    {n:"S4", t:"Assemble / build", do:"Produce the site (framework/output from deploy.json).", v:"build succeeds; output dir populated"},
+    {n:"S5", t:"Site QA", do:"Links, SEO/meta, accessibility, responsive checks.", v:"no broken internal links; required meta present"},
+    {n:"S6", t:"Deploy (gated)", do:"Deploy to the project's target (human approval, L6).", v:"deployment reachable; smoke check passes"},
+  ],
+};
+const PIPE_NOTE = {
+  odoo: "Read projects/<name>/odoo-build-spec/mcp-runbook.md. Numbers come from the project's demo-data.json.",
+  site: "Read projects/<name>/site-spec/runbook.md. Structural — never invent page counts or copy.",
+};
 const LOOPS = [
-  {id:"L1", role:"Master orchestration — sequence stages, gate, persist, escalate", where:"orchestrator.py"},
+  {id:"L1", role:"Master orchestration — per enabled deliverable, sequence stages, gate, persist, escalate", where:"orchestrator.py"},
   {id:"L2", role:"Per-stage bounded retry (MAX_ATTEMPTS = 3), idempotent", where:"orchestrator.py"},
   {id:"L3", role:"ReAct — reason → act(tool) → observe until the gate passes", where:"agents/llm.py"},
   {id:"L4", role:"Reflection — self-critique vs. goal before handoff (optional)", where:"agents/llm.py"},
-  {id:"L5", role:"Corrective-RAG — out of scope here (documented stub)", where:"—"},
-  {id:"L6", role:"Human-in-the-loop — destructive / pricing / comms pause for approval", where:"approvals.py"},
-  {id:"L7", role:"Operational AI loops — created into Odoo as scheduled actions, not run", where:"Stage 8"},
+  {id:"L5", role:"Corrective-RAG — active for the website pipeline (ground copy/facts); not used for ERP", where:"agents/site/research.py"},
+  {id:"L6", role:"Human-in-the-loop — destructive / pricing / comms / production deploys pause for approval", where:"approvals.py"},
+  {id:"L7", role:"Operational AI loops — created into Odoo as scheduled actions, not run", where:"automations stage"},
 ];
 const AGENTS = [
-  {f:"foundation.py", s:"Stages 0–2", d:"Connect & reset, install modules, company/tax/finance."},
-  {f:"master_data.py", s:"Stage 3", d:"Partners, employees, departments, dive sites, resources."},
-  {f:"products.py", s:"Stages 4–5", d:"Room types/rooms, dive/courses/gear/F&B/retail; POS & booking."},
-  {f:"transactions.py", s:"Stages 6–7", d:"Bookings/dives/POS/CRM draft pass; confirm/invoice/pay pass."},
-  {f:"automation.py", s:"Stage 8", d:"Native scheduled/server actions + documented AI hooks."},
-  {f:"qa.py", s:"Stage 9", d:"Cross-module spot-checks and the build report."},
-  {f:"llm.py", s:"Reasoning runtime", d:"Anthropic ReAct tool-loop on claude-opus-4-8 — only when keyed."},
+  {f:"agents/odoo/foundation.py", s:"ERP · 0–2", d:"Connect & reset, install modules, company/tax/finance."},
+  {f:"agents/odoo/master_data.py", s:"ERP · 3", d:"Partners, employees, departments, resources, industry data."},
+  {f:"agents/odoo/products.py", s:"ERP · 4–5", d:"Products/rooms; POS & booking."},
+  {f:"agents/odoo/transactions.py", s:"ERP · 6–7", d:"Draft pass; confirm/invoice/pay pass."},
+  {f:"agents/odoo/automation.py", s:"ERP · 8", d:"Native scheduled/server actions + AI hooks."},
+  {f:"agents/odoo/qa.py", s:"ERP · 9", d:"Cross-module spot-checks and the build report."},
+  {f:"agents/site/ingest.py + research.py", s:"Web · S0–S1", d:"Ingest inputs/Drive; ground facts via RAG."},
+  {f:"agents/site/architecture.py + content.py", s:"Web · S2–S3", d:"Information architecture; brand-voice copy."},
+  {f:"agents/site/assemble.py + site_qa.py + deploy.py", s:"Web · S4–S6", d:"Build, QA, gated deploy."},
+  {f:"agents/llm.py", s:"Reasoning runtime", d:"Anthropic ReAct/RAG loop on claude-opus-4-8 — only when keyed."},
 ];
 const COUNT_KEYS = [
-  {k:"Customers", v:"150"}, {k:"Employees", v:"~36"}, {k:"Products", v:"~42"},
-  {k:"Rooms", v:"24"}, {k:"Sale orders", v:"≥ 600"}, {k:"POS orders", v:"~2000"},
-  {k:"Invoices", v:"~400"}, {k:"Automations", v:"~27"}, {k:"CRM leads", v:"≥ 80"}, {k:"Modules", v:"13"},
+  {k:"Customers", v:"150"}, {k:"Employees", v:"~36"}, {k:"Rooms", v:"24"},
+  {k:"Sale orders", v:"≥ 600"}, {k:"POS orders", v:"~2000"}, {k:"Invoices", v:"~400"},
+  {k:"Automations", v:"~27"}, {k:"Pages", v:"from spec"}, {k:"Sourced facts", v:"from spec"},
+  {k:"Broken links", v:"0"},
 ];
 
-document.getElementById("stageList").innerHTML = STAGES.map(s=>`
-  <div class="stage"><div class="num">${s.n}</div>
-    <div><h4>${s.t}</h4><p class="do">${s.do}</p><span class="verify">${s.v}</span></div></div>`).join("");
+function renderStages(which){
+  document.getElementById("stageList").innerHTML = STAGES[which].map(s=>`
+    <div class="stage"><div class="num">${s.n}</div>
+      <div><h4>${s.t}</h4><p class="do">${s.do}</p><span class="verify">${s.v}</span></div></div>`).join("");
+  document.getElementById("pipeNote").textContent = PIPE_NOTE[which];
+}
+function showPipe(which){
+  document.getElementById("tabOdoo").classList.toggle("on", which==="odoo");
+  document.getElementById("tabSite").classList.toggle("on", which==="site");
+  renderStages(which);
+}
 document.getElementById("loopRows").innerHTML = LOOPS.map(l=>`
   <tr><td><code>${l.id}</code></td><td>${l.role}</td><td class="lk">${l.where}</td></tr>`).join("");
 document.getElementById("agentCards").innerHTML = AGENTS.map(a=>`
-  <div class="card"><span class="pill">${a.s}</span><h3 style="margin:8px 0 4px">${a.f}</h3>
+  <div class="card"><span class="pill">${a.s}</span><h3 style="margin:8px 0 4px;font-size:14px">${a.f}</h3>
     <p>${a.d}</p></div>`).join("");
 document.getElementById("countGrid").innerHTML = COUNT_KEYS.map(c=>`
   <div class="kpi"><div class="v">${c.v}</div><div class="k">${c.k}</div></div>`).join("");
+renderStages("odoo");
 </script>
 </body>
 </html>
