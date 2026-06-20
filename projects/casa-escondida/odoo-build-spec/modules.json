@@ -1,0 +1,13 @@
+{
+  "install_order": [
+    "base", "account", "sale_management", "stock", "point_of_sale", "hr", "crm",
+    "website", "calendar", "appointment", "sale_subscription", "pos_restaurant", "hotel"
+  ],
+  "recommended_addons": ["account_accountant", "sale_pos"],
+  "phases": [
+    {"name": "core", "modules": ["base", "account", "sale_management", "stock"]},
+    {"name": "ops", "modules": ["point_of_sale", "hr", "crm", "calendar", "appointment"]},
+    {"name": "industry", "modules": ["website", "sale_subscription", "pos_restaurant", "hotel"]}
+  ],
+  "gaps": ["hotel app requires SaaS industry activation (browser-only, per BUILD-LOG.md)"]
+}

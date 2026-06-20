@@ -1,0 +1,7 @@
+{
+  "palette": {"primary": "#0e7c86", "accent": "#f2b705", "ink": "#10242b", "paper": "#f7fbfc"},
+  "type": {"heading": "Fraunces", "body": "Inter"},
+  "voice": "warm, expert, understated; speaks to divers and unhurried travellers",
+  "logo": "assets/logo.svg",
+  "banned_words": ["lorem", "ipsum", "TODO", "placeholder"]
+}

@@ -1,0 +1,13 @@
+{
+  "naming_conventions": {
+    "product_default_code": "<PREFIX>-<seq>",
+    "room_lot": "STD-01",
+    "sale_order_ref": "CE-<channel>-<seq>"
+  },
+  "models": {
+    "res.partner": {"studio_fields": ["persona"]},
+    "product.room": {"fields": ["name", "default_code", "room_type"]},
+    "dive.site": {"fields": ["name"]},
+    "account.move": {"key": "ref", "move_types": ["out_invoice", "in_invoice"]}
+  }
+}

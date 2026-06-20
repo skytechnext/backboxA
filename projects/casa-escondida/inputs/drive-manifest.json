@@ -1,0 +1,8 @@
+{
+  "folder": "BlackboxA",
+  "items": [
+    {"name": "logo.svg", "type": "image"},
+    {"name": "resort-photos/", "type": "folder"},
+    {"name": "rate-card.pdf", "type": "pdf"}
+  ]
+}

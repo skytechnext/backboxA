@@ -1,0 +1,5 @@
+# Runtime: standard library only. The reasoning layer (optional) uses the official Anthropic SDK.
+anthropic>=0.40.0
+
+# Dev/test only
+pytest>=8.0.0

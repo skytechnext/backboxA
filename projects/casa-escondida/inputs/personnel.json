@@ -1,0 +1,7 @@
+{
+  "team": [
+    {"name": "Resort Manager", "role": "Operations"},
+    {"name": "Dive Master", "role": "Dive Centre"},
+    {"name": "Head Chef", "role": "F&B"}
+  ]
+}

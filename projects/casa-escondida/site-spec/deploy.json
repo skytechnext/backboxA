@@ -1,0 +1,7 @@
+{
+  "framework": "static",
+  "build_command": null,
+  "output_dir": "dist",
+  "target": "vercel",
+  "smoke_routes": ["/", "/rooms", "/diving", "/rates", "/contact"]
+}

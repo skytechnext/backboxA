@@ -1,0 +1,9 @@
+{
+  "name": "casa-escondida",
+  "display_name": "Casa Escondida Anilao",
+  "locale": "Asia/Manila",
+  "currency": "PHP",
+  "odoo_version": 19,
+  "deliverables": ["odoo", "site"],
+  "industry": "resort-dive"
+}

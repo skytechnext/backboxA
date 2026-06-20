@@ -1,0 +1,23 @@
+{
+  "pages": [
+    {"id": "home", "title": "Casa Escondida Anilao — Dive Resort",
+     "description": "Boutique dive resort in Anilao: rooms, diving, courses and more.",
+     "sections": ["hero", "intro", "highlights"], "links": ["rooms", "diving", "rates", "contact"]},
+    {"id": "rooms", "title": "Rooms & Villas",
+     "description": "Standard, Deluxe, Villa and Dorm accommodation at Casa Escondida.",
+     "sections": ["room-types", "amenities"], "links": ["rates", "contact"]},
+    {"id": "diving", "title": "Diving & Dive Sites",
+     "description": "Fun dives, courses and 35+ dive sites around Anilao.",
+     "sections": ["dive-intro", "dive-sites", "courses"], "links": ["rates", "contact"]},
+    {"id": "rates", "title": "Rates & Packages",
+     "description": "Room, dive and package rates for Casa Escondida Anilao.",
+     "sections": ["room-rates", "dive-packages"], "links": ["contact"]},
+    {"id": "gallery", "title": "Gallery",
+     "description": "Photos of the resort, rooms and underwater life.",
+     "sections": ["photo-grid"], "links": ["home"]},
+    {"id": "contact", "title": "Contact & Booking",
+     "description": "Reach Casa Escondida Anilao to book your stay.",
+     "sections": ["contact-form", "map"], "links": ["home"]}
+  ],
+  "required_pages": ["home", "rooms", "diving", "rates", "contact"]
+}

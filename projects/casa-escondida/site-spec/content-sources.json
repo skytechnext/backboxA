@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {"id": "brief", "type": "file", "path": "brief.md"},
+    {"id": "personnel", "type": "file", "path": "personnel.json"},
+    {"id": "drive", "type": "drive", "manifest": "drive-manifest.json"}
+  ],
+  "required_facts": ["company_name", "location", "room_count", "dive_site_count", "currency"]
+}

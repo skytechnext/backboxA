@@ -1,0 +1,13 @@
+{
+  "native": [
+    {"name": "Dynamic Pricing", "model": "ir.cron", "kind": "scheduled"},
+    {"name": "Overbooking Guard", "model": "ir.cron", "kind": "scheduled"},
+    {"name": "Review Request", "model": "ir.cron", "kind": "scheduled"},
+    {"name": "Daily Revenue Digest", "model": "ir.cron", "kind": "scheduled"},
+    {"name": "Low-Stock Reorder", "model": "ir.cron", "kind": "scheduled"}
+  ],
+  "ai_hooks": [
+    {"name": "AI: Demand Forecast", "registered_as": "doc"},
+    {"name": "AI: Guest Sentiment", "registered_as": "doc"}
+  ]
+}

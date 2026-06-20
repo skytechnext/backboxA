@@ -1,0 +1,17 @@
+{
+  "sections": [
+    {"id": "hero", "page": "home", "kind": "hero"},
+    {"id": "intro", "page": "home", "kind": "prose"},
+    {"id": "highlights", "page": "home", "kind": "cards"},
+    {"id": "room-types", "page": "rooms", "kind": "cards"},
+    {"id": "amenities", "page": "rooms", "kind": "list"},
+    {"id": "dive-intro", "page": "diving", "kind": "prose"},
+    {"id": "dive-sites", "page": "diving", "kind": "list"},
+    {"id": "courses", "page": "diving", "kind": "cards"},
+    {"id": "room-rates", "page": "rates", "kind": "table"},
+    {"id": "dive-packages", "page": "rates", "kind": "table"},
+    {"id": "photo-grid", "page": "gallery", "kind": "gallery"},
+    {"id": "contact-form", "page": "contact", "kind": "form"},
+    {"id": "map", "page": "contact", "kind": "embed"}
+  ]
+}
