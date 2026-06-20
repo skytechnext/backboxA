@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Casa Escondida — The Black Box (Autonomous Engagement Engine)</title>
+<meta name="description" content="A deep, interactive explainer of the multi-agent 'black box': feed a brief, Odoo credentials and a Google Drive of company data — get a full strategy website and a live Odoo 19 ERP. Every agent, loop, tool, guardrail and output, visualised.">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#0a0f1a"><link rel="icon" href="assets/favicon.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<script>if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}</script>
+<style>
+:root{--bg:#0a0f1a;--panel:#121c30;--panel2:#16223a;--panel3:#1b2942;--line:#1f2d49;--ink:#e8f0fb;--ink2:#a9bdd8;--muted:#7388ab;--teal:#19c6c6;--aqua:#37e0c8;--blue:#3b82f6;--green:#36d399;--amber:#ffb454;--coral:#ff6b6b;--purple:#a78bfa;--pink:#f472b6;--grad:linear-gradient(135deg,#19c6c6,#3b82f6 55%,#6366f1);--shadow:0 18px 50px -20px rgba(0,0,0,.6);--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+html[data-theme=light]{--bg:#eef3fb;--panel:#fff;--panel2:#f3f7ff;--panel3:#e9f0fb;--line:#d3deef;--ink:#10203a;--ink2:#33486a;--muted:#64789a;--shadow:0 18px 50px -28px rgba(20,40,80,.35)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.55;overflow-x:hidden}
+h1,h2,h3,h4{margin:0 0 .4em;font-weight:800;letter-spacing:-.02em}a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
+small{font-size:.78rem}code{font-family:var(--mono);background:var(--panel2);padding:1px 5px;border-radius:5px;font-size:.85em}
+/* progress + bar */
+#prog{position:fixed;top:0;left:0;height:3px;width:0;background:var(--grad);z-index:200;transition:width .1s}
+#bar{position:sticky;top:0;z-index:120;background:rgba(10,15,26,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 16px;flex-wrap:wrap}
+html[data-theme=light] #bar{background:rgba(255,255,255,.85)}
+#bar img{height:24px}
+.bar-r{display:flex;gap:8px;align-items:center}
+.tb-btn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:7px 11px;font-size:.78rem;cursor:pointer;font-weight:600}
+.tb-btn:hover{border-color:var(--teal)}
+/* section nav dropdown */
+#secnav{position:fixed;top:52px;right:16px;z-index:130;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:8px;max-height:74vh;overflow:auto;width:250px;display:none}
+#secnav.open{display:block}
+#secnav a{display:block;color:var(--ink2);font-size:.82rem;padding:6px 10px;border-radius:8px}
+#secnav a:hover,#secnav a.active{background:var(--panel2);color:var(--teal);text-decoration:none}
+#secnav .gh{font-size:.66rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:8px 10px 3px;font-weight:700}
+header{padding:48px 22px 6px;text-align:center}
+header .eyebrow{font-size:.74rem;text-transform:uppercase;letter-spacing:.14em;color:var(--aqua);font-weight:700}
+header h1{font-size:clamp(1.8rem,5vw,3rem);background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:8px}
+header p{color:var(--ink2);max-width:860px;margin:8px auto}
+.wrap{max-width:1180px;margin:0 auto;padding:14px 20px 90px}
+section.sec{margin:50px 0;scroll-margin-top:64px}
+.sec>h2{font-size:clamp(1.3rem,3.2vw,1.85rem)}
+.sec>h2 .n{color:var(--teal);font-family:var(--mono);font-size:.62em;margin-right:.5em}
+.lead{color:var(--ink2);max-width:920px;margin:.2em 0 1.2em}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow);min-width:0}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}.g5{grid-template-columns:repeat(5,1fr)}
+.grid>*{min-width:0}
+.tag{display:inline-block;font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:20px;border:1px solid var(--line)}
+.t-in{color:var(--aqua);border-color:#1d5e63;background:#0e2a2c}.t-box{color:var(--purple);border-color:#3a2f63;background:#1a1530}.t-out{color:var(--green);border-color:#1d5e3f;background:#0e2a1e}
+html[data-theme=light] .t-in{background:#e2faf8}html[data-theme=light] .t-box{background:#f0ebff}html[data-theme=light] .t-out{background:#e6f8ee}
+.muted{color:var(--muted)}.note{font-size:.78rem;color:var(--muted)}
+ul{margin:.3em 0 .3em 1.1em;padding:0}li{margin:.22em 0}
+.kvs{font-family:var(--mono);font-size:.76rem;color:var(--ink2)}.kvs b{color:var(--aqua);font-weight:600}
+.callout{border-left:3px solid var(--teal);background:var(--panel);border-radius:0 12px 12px 0;padding:13px 16px;margin:14px 0}
+.callout.warn{border-left-color:var(--amber)}.callout.sec{border-left-color:var(--coral)}
+.pill{display:inline-block;font-size:.66rem;font-weight:700;padding:2px 8px;border-radius:20px}
+.p-green{background:#0e2a1e;color:var(--green)}.p-amber{background:#2a230e;color:var(--amber)}.p-red{background:#2a0e14;color:var(--coral)}.p-blue{background:#0e1b2a;color:#7eb0ff}.p-purple{background:#1a1530;color:var(--purple)}.p-teal{background:#0e2a2c;color:var(--aqua)}
+table{width:100%;border-collapse:collapse;font-size:.84rem}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--aqua);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;min-width:0;max-width:100%}
+/* count up stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center;min-width:0}
+.stat .v{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.02em}
+.stat .l{font-size:.74rem;color:var(--ink2);font-weight:600;margin-top:2px}
+/* reveal */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s,transform .6s}.rv.on{opacity:1;transform:none}
+/* flow */
+.flow{display:grid;grid-template-columns:1fr 50px 1fr 50px 1fr;align-items:stretch;gap:0;margin:8px 0}
+.flow .arr{display:flex;align-items:center;justify-content:center;color:var(--teal);font-size:1.5rem;font-weight:900}
+.flow-col{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;min-width:0}
+.flow-col.box{background:linear-gradient(160deg,#16112e,#101a30);border-color:#3a2f63}
+html[data-theme=light] .flow-col.box{background:linear-gradient(160deg,#f0ebff,#eaf1ff)}
+.flow-col h3{font-size:.96rem;margin-bottom:8px}
+.chip{display:block;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:7px 9px;margin:6px 0;font-size:.8rem;color:var(--ink2);cursor:default;transition:border-color .2s,background .2s}
+.chip[data-in]{cursor:pointer}.chip[data-in]:hover,.chip.hot{border-color:var(--teal);background:var(--panel3)}
+.chip b{color:var(--ink);font-weight:600}
+@media(max-width:860px){.flow{grid-template-columns:1fr}.flow .arr{transform:rotate(90deg);padding:4px 0}}
+/* agent topology */
+.topo{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.node{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;cursor:pointer;text-align:center;transition:transform .15s,border-color .2s,box-shadow .2s;min-width:0}
+.node:hover{transform:translateY(-3px);border-color:var(--teal)}
+.node.sel{border-color:var(--teal);box-shadow:0 0 0 2px rgba(25,198,198,.35);background:var(--panel3)}
+.node.orch{grid-column:1/-1;background:linear-gradient(160deg,#16112e,#101a30);border-color:#3a2f63}
+html[data-theme=light] .node.orch{background:linear-gradient(160deg,#f0ebff,#eaf1ff)}
+.node .ic{font-size:1.7rem}.node .nm{font-weight:800;font-size:.9rem;margin-top:4px}.node .ro{font-size:.66rem;color:var(--aqua);text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+#agentDetail{margin-top:16px}
+.adetail{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media(max-width:760px){.topo{grid-template-columns:repeat(2,1fr)}.adetail{grid-template-columns:1fr}}
+.kv{display:grid;grid-template-columns:84px 1fr;gap:8px;font-size:.82rem;padding:5px 0;border-bottom:1px dashed var(--line)}
+.kv b{color:var(--aqua);font-weight:600}
+.taglist span{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:3px 7px;margin:3px 3px 0 0;font-size:.74rem;color:var(--ink2)}
+/* loop visualiser */
+.loopwrap{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:center}
+@media(max-width:760px){.loopwrap{grid-template-columns:1fr}}
+.ring{position:relative;width:280px;height:280px;margin:0 auto}
+.ring svg{position:absolute;inset:0}
+.lnode{position:absolute;width:90px;margin-left:-45px;text-align:center;font-size:.74rem;font-weight:700;color:var(--ink2);background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:6px 4px;transition:all .25s}
+.lnode.act{color:#fff;background:var(--grad);border-color:transparent;transform:scale(1.08)}
+.dot{fill:var(--teal)}
+.loopbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.loop-desc{font-size:.86rem;color:var(--ink2);min-height:46px}
+/* run simulator */
+.simgrid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+@media(max-width:880px){.simgrid{grid-template-columns:1fr}}
+.stage{display:grid;grid-template-columns:30px 1fr;gap:10px;align-items:start;padding:9px;border:1px solid var(--line);border-radius:11px;margin-bottom:8px;background:var(--panel2);opacity:.55;transition:opacity .3s,border-color .3s}
+.stage.run{opacity:1;border-color:var(--amber)}
+.stage.done{opacity:1;border-color:var(--green)}
+.stage .sn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.78rem;background:var(--panel3);color:var(--ink2)}
+.stage.run .sn{background:var(--amber);color:#000}.stage.done .sn{background:var(--green);color:#000}
+.stage h4{font-size:.9rem;margin:0}.stage .sd{font-size:.76rem;color:var(--muted)}
+.stage .sv{font-size:.72rem;color:var(--aqua);font-family:var(--mono);margin-top:3px;display:none}
+.stage.done .sv,.stage.run .sv{display:block}
+.countgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.cnt{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:10px;text-align:center}
+.cnt .cv{font-size:1.3rem;font-weight:900;color:var(--ink)}.cnt .cl{font-size:.68rem;color:var(--ink2)}
+.simbar{height:8px;border-radius:6px;background:var(--panel2);overflow:hidden;margin:8px 0}
+.simbar i{display:block;height:100%;width:0;background:var(--grad);transition:width .4s}
+.simbtns{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.btn{background:var(--grad);color:#fff;font-weight:700;padding:9px 15px;border-radius:11px;font-size:.82rem;border:0;cursor:pointer}
+.btn.ghost{background:var(--panel);border:1px solid var(--line);color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.simlog{font-family:var(--mono);font-size:.74rem;color:var(--ink2);background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:10px;height:140px;overflow:auto;margin-top:10px}
+.simlog div{padding:1px 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.simlog .ok{color:var(--green)}.simlog .gate{color:var(--amber)}
+/* accordion */
+.acc{border:1px solid var(--line);border-radius:12px;margin:8px 0;overflow:hidden;background:var(--panel)}
+.acc-h{padding:12px 15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:.92rem}
+.acc-h:hover{background:var(--panel2)}.acc-h .ic{color:var(--teal);font-weight:900}
+.acc-b{max-height:0;overflow:hidden;transition:max-height .35s ease;padding:0 15px}
+.acc.open .acc-b{max-height:1200px;padding:0 15px 14px}
+.acc.open .acc-h .ic{transform:rotate(45deg)}
+/* tabs */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{background:var(--panel2);border:1px solid var(--line);color:var(--ink2);border-radius:9px;padding:7px 12px;font-size:.8rem;cursor:pointer;font-weight:600}
+.tab.on{background:var(--grad);color:#fff;border-color:transparent}
+.tabpane{display:none}.tabpane.on{display:block}
+/* layered stack */
+.layer{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:8px;min-width:0}
+.layer .ln{font-weight:800;color:var(--aqua);font-size:.85rem}.layer p{margin:0;color:var(--ink2);font-size:.84rem}
+@media(max-width:620px){.layer{grid-template-columns:1fr}}
+@media(max-width:880px){.g3,.g4,.g5{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.g2,.g3,.g4,.g5{grid-template-columns:1fr}.topo{grid-template-columns:1fr}}
+.foot{text-align:center;margin-top:46px;padding-top:20px;border-top:1px solid var(--line)}
+</style></head>
+<body>
+<div id="prog"></div>
+<div id="bar">
+  <img src="assets/logo-white.svg" alt="Casa Escondida" id="logo">
+  <div class="bar-r">
+    <a href="index.html" class="tb-btn">← Report</a>
+    <a href="ai-build-playbook.html" class="tb-btn">📘 Playbook</a>
+    <button class="tb-btn" onclick="toggleTheme()" id="themeBtn">◐ Theme</button>
+    <button class="tb-btn" onclick="toggleNav()">☰ Sections</button>
+  </div>
+</div>
+<nav id="secnav"></nav>
+
+<header>
+  <div class="eyebrow">Technext · Productized Delivery</div>
+  <h1>The Black Box</h1>
+  <p>An autonomous, multi-agent engine that turns a thin set of inputs — a brief, Odoo credentials and a Google&nbsp;Drive of company material — into <strong>two finished deliverables</strong>: a deep strategy &amp; due-diligence website (this very site) <em>and</em> a fully populated, demo-ready Odoo&nbsp;19 ERP.</p>
+  <p class="note">This page explains <strong>everything inside the box</strong> — every agent, every loop, every tool, guardrail and output — and lets you <strong>drive a live simulation</strong> of a build run. Scroll, click the agents, play the loop, and run the pipeline.</p>
+</header>
+
+<div class="wrap">
+
+  <!-- 00 STATS -->
+  <section class="sec" id="glance">
+    <div class="stats">
+      <div class="stat rv"><div class="v" data-target="5">0</div><div class="l">input channels</div></div>
+      <div class="stat rv"><div class="v" data-target="8">0</div><div class="l">specialist agents</div></div>
+      <div class="stat rv"><div class="v" data-target="7" data-suffix="+">0</div><div class="l">distinct loops</div></div>
+      <div class="stat rv"><div class="v" data-target="2">0</div><div class="l">finished deliverables</div></div>
+    </div>
+  </section>
+
+  <!-- 01 FLOW -->
+  <section class="sec" id="flow" data-nav="Inputs → Box → Outputs" data-grp="Overview">
+    <h2 class="rv"><span class="n">01</span>Inputs → Black Box → Outputs</h2>
+    <p class="lead rv">The whole engagement in one picture. <strong>Click an input</strong> to see where it lands downstream. Everything on the left is supplied; everything on the right is generated, verified and shipped.</p>
+    <div class="flow rv">
+      <div class="flow-col">
+        <span class="tag t-in">Inputs</span><h3 style="margin-top:8px">What you feed in</h3>
+        <span class="chip" data-in="instructions"><b>📋 Instructions</b> — goals, scope, tone</span>
+        <span class="chip" data-in="creds"><b>🔑 Odoo credentials</b> — URL, DB, key</span>
+        <span class="chip" data-in="drive"><b>🗂 Google Drive</b> — photos, ads, data</span>
+        <span class="chip" data-in="name"><b>🏷 Company name</b> + brand assets</span>
+        <span class="chip" data-in="people"><b>👥 Key personnel</b> — owners, heads</span>
+      </div>
+      <div class="arr">→</div>
+      <div class="flow-col box">
+        <span class="tag t-box">The Black Box</span><h3 style="margin-top:8px">Autonomous agents</h3>
+        <span class="chip"><b>Orchestrator</b> + 7 specialists</span>
+        <span class="chip">Research → Write → Design → Build → Verify</span>
+        <span class="chip">MCP / XML-RPC · web · Drive · files</span>
+        <span class="chip">Looped &amp; gated until each stage is green</span>
+        <span class="chip">Human approval on money &amp; comms</span>
+      </div>
+      <div class="arr">→</div>
+      <div class="flow-col">
+        <span class="tag t-out">Outputs</span><h3 style="margin-top:8px">What you get back</h3>
+        <span class="chip" data-out><b>🌐 Strategy website</b> — 27 sections + companions</span>
+        <span class="chip" data-out><b>🏨 Live Odoo 19 demo</b> — apps, Hotel, booking</span>
+        <span class="chip" data-out><b>📑 Build log</b> + machine-readable spec</span>
+        <span class="chip" data-out><b>📲 Installable PWA</b>, mobile-clean, offline</span>
+      </div>
+    </div>
+    <p class="note rv" id="flowHint">Tip: click <b>📋 Instructions</b>, <b>🗂 Google Drive</b>, etc. to trace each input.</p>
+  </section>
+
+  <!-- 02 INPUT CONTRACT -->
+  <section class="sec" id="inputs" data-nav="The Input Contract" data-grp="Overview">
+    <h2 class="rv"><span class="n">02</span>The input contract</h2>
+    <p class="lead rv">Five input channels, each with a defined shape so the agents know exactly what to consume and where it lands. Nothing else is required — the engine researches the rest. Expand each for format, an example and validation.</p>
+    <div id="inputAcc"></div>
+    <div class="callout sec rv"><strong>Secret handling.</strong> Odoo credentials and any Drive-sourced PII are runtime secrets: passed via environment / MCP config, used only to authenticate API calls, and <strong>never committed</strong> to the generated repo. The engine emits a key-rotation reminder after every run.</div>
+  </section>
+
+  <!-- 03 AGENT TOPOLOGY -->
+  <section class="sec" id="agents" data-nav="The Agents (interactive)" data-grp="Inside the box">
+    <h2 class="rv"><span class="n">03</span>Inside the box — the agent roster</h2>
+    <p class="lead rv">An <strong>Orchestrator</strong> owns state and sequencing; it dispatches seven specialists and only advances a stage once that stage's verification passes. <strong>Click any agent</strong> to inspect its mandate, tools, what it reads/writes, its loop and its "done-when".</p>
+    <div class="topo rv" id="topo"></div>
+    <div id="agentDetail"></div>
+  </section>
+
+  <!-- 04 THE LOOPS -->
+  <section class="sec" id="loops" data-nav="Every Loop, Explained" data-grp="Inside the box">
+    <h2 class="rv"><span class="n">04</span>Every loop, explained</h2>
+    <p class="lead rv">The engine is loops inside loops. The animation shows the universal agent cycle; the buttons swap in each specific loop the system runs. <strong>Press play</strong>, then step through the loops.</p>
+    <div class="card rv">
+      <div class="loopwrap">
+        <div class="ring" id="ring">
+          <svg viewBox="0 0 280 280"><circle cx="140" cy="140" r="110" fill="none" stroke="var(--line)" stroke-width="2"/><circle id="dot" class="dot" cx="140" cy="30" r="7"/></svg>
+        </div>
+        <div>
+          <div class="tabs" id="loopTabs"></div>
+          <h4 id="loopName">The universal agent cycle</h4>
+          <p class="loop-desc" id="loopDesc">Pick a loop above. Every agent, at its core, runs this five-beat cycle.</p>
+          <div class="loopbtns">
+            <button class="btn" onclick="playLoop()" id="playBtn">▶ Play</button>
+            <button class="btn ghost" onclick="stepLoop()">⏭ Step</button>
+            <button class="btn ghost" onclick="stopLoop()">⏸ Pause</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid g2 rv" style="margin-top:16px" id="loopCards"></div>
+  </section>
+
+  <!-- 05 RUN SIMULATOR -->
+  <section class="sec" id="sim" data-nav="Run Simulator (live)" data-grp="Inside the box">
+    <h2 class="rv"><span class="n">05</span>Drive a build run — the 9-stage simulator</h2>
+    <p class="lead rv">This is what the Orchestrator actually does. <strong>Step</strong> through each stage (or <strong>auto-run</strong>) and watch records accumulate in the live Odoo instance, the verification gate clear, and the build progress to green — exactly the sequence that produced the Casa Escondida demo.</p>
+    <div class="simbtns rv">
+      <button class="btn" onclick="simNext()" id="simNextBtn">⏭ Next stage</button>
+      <button class="btn ghost" onclick="simAuto()" id="simAutoBtn">▶ Auto-run</button>
+      <button class="btn ghost" onclick="simReset()">↺ Reset</button>
+      <span class="note" id="simStatus" style="align-self:center">Ready — stage 0 of 9</span>
+    </div>
+    <div class="simbar rv"><i id="simProg"></i></div>
+    <div class="simgrid">
+      <div class="rv"><div id="stageList"></div></div>
+      <div class="rv">
+        <div class="card">
+          <h4 style="margin-bottom:4px">Live record counts</h4>
+          <div class="cap note" style="margin-bottom:10px">Accumulating in <code>edu-escondida.odoo.com</code> as stages complete</div>
+          <div class="countgrid" id="countGrid"></div>
+          <div class="simlog" id="simLog"><div>› build run idle — press “Next stage” or “Auto-run”.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 RUNBOOK DETAIL -->
+  <section class="sec" id="runbook" data-nav="9-Stage Runbook" data-grp="Inside the box">
+    <h2 class="rv"><span class="n">06</span>The 9-stage runbook in detail</h2>
+    <p class="lead rv">Each stage lists its actions and the <strong>verification query</strong> that must pass before the next begins. Idempotency rules (search-before-create) make every stage safe to re-run.</p>
+    <div class="tbl-wrap rv"><table>
+      <thead><tr><th>#</th><th>Stage</th><th>Key actions</th><th>Verification gate</th></tr></thead>
+      <tbody id="runbookRows"></tbody>
+    </table></div>
+  </section>
+
+  <!-- 07 HARNESS -->
+  <section class="sec" id="harness" data-nav="The Harness (6 layers)" data-grp="How it works">
+    <h2 class="rv"><span class="n">07</span>The harness — six layers around the loop</h2>
+    <p class="lead rv">The loop is the brain; the harness is everything that makes it safe, grounded and repeatable. Each layer has one job and can be swapped without rewriting the others.</p>
+    <div class="rv" id="stackList"></div>
+  </section>
+
+  <!-- 08 CONTEXT/MEMORY -->
+  <section class="sec" id="memory" data-nav="Context & Memory" data-grp="How it works">
+    <h2 class="rv"><span class="n">08</span>Context engineering &amp; memory</h2>
+    <p class="lead rv">"What does the agent know, see and remember at the moment of action?" The discipline that separates a demo from a dependable system.</p>
+    <div class="grid g3">
+      <div class="card rv"><h4>🗒 Short-term (scratchpad)</h4><p class="muted">Run-scoped state checkpointed across every step — write a fact now, fetch it later. When the window fills, old context is <em>compacted</em> into a summary (this build was compacted mid-run and resumed without losing the thread).</p></div>
+      <div class="card rv"><h4>🧠 Long-term memory</h4><p class="muted">Knowledge that survives the session — stored as files with per-write audit trails, shareable between agents. One run learns from the last instead of starting cold (e.g. created-record IDs, prior decisions).</p></div>
+      <div class="card rv"><h4>🛠 Tools as context</h4><p class="muted">Tools consume the context budget too. The model gets context-awareness (how much budget remains), prefers programmatic tool-calling for fan-out, and relies on crisp tool descriptions — it only acts as well as its tools are described.</p></div>
+    </div>
+    <div class="callout rv"><strong>Rule of thumb:</strong> curate context, don't dump it. Retrieve the few facts a step needs, summarise the rest, keep tool outputs tight. Most agent failures are <em>context</em> failures — wrong, missing or stale information at the moment of action.</div>
+  </section>
+
+  <!-- 09 RAG -->
+  <section class="sec" id="rag" data-nav="RAG & Grounding" data-grp="How it works">
+    <h2 class="rv"><span class="n">09</span>RAG — grounding the engine in real facts</h2>
+    <p class="lead rv">Retrieval-Augmented Generation feeds the model real, current information (the company's docs, rates, photos, the live web) rather than trusting memory. The Research agent grounds every written claim and carries a source + confidence with it.</p>
+    <div class="tbl-wrap rv"><table>
+      <thead><tr><th>Approach</th><th>How it works</th><th>Used here for</th><th>Cost</th></tr></thead>
+      <tbody>
+        <tr><td><b>Classic RAG</b></td><td>Retrieve top-k once → generate</td><td>FAQ / policy answers</td><td><span class="pill p-green">low</span></td></tr>
+        <tr><td><b>Agentic RAG</b></td><td>Model decides when/how to retrieve; can decompose, retry &amp; cross-check</td><td>Competitor &amp; market research</td><td><span class="pill p-amber">~10×</span></td></tr>
+        <tr><td><b>Adaptive RAG</b> <span class="pill p-green">default</span></td><td>Classifier routes each query by complexity</td><td>Mixed workloads</td><td><span class="pill p-blue">scales to need</span></td></tr>
+        <tr><td><b>Corrective RAG</b></td><td>Model grades its own retrieval &amp; re-queries on weak evidence</td><td>High-stakes facts (numbers, names)</td><td><span class="pill p-amber">+eval pass</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout warn rv"><strong>Governance precedes retrieval.</strong> Access controls, metadata and provenance come first; every claim carries source + confidence, and the engine never invents what it can't retrieve — which is why the report flags unverified items explicitly.</div>
+  </section>
+
+  <!-- 10 GUARDRAILS -->
+  <section class="sec" id="guardrails" data-nav="Guardrails & Security" data-grp="How it works">
+    <h2 class="rv"><span class="n">10</span>Guardrails, security &amp; human-in-the-loop</h2>
+    <div class="grid g3">
+      <div class="card rv"><h4>🚦 Gated &amp; bounded</h4><p class="muted">No stage starts before the prior verifies green. Retries are bounded (max attempts) then escalate — no thrashing, no runaway cost.</p></div>
+      <div class="card rv"><h4>🙋 Human approval</h4><p class="muted">Price changes, destructive resets and outbound guest comms pause for explicit sign-off. Info-only steps run automatically.</p></div>
+      <div class="card rv"><h4>🔒 Secrets &amp; least privilege</h4><p class="muted">Credentials are runtime config, never committed; tools run least-privilege; keys rotated after use; external/retrieved content treated as untrusted (prompt-injection defense).</p></div>
+      <div class="card rv"><h4>🔁 Idempotent writes</h4><p class="muted">Search-by-natural-key before every create — re-running a stage never duplicates records.</p></div>
+      <div class="card rv"><h4>🧾 Audit trail</h4><p class="muted">Every write logged; created-record IDs persisted so partial progress is detectable and resumable.</p></div>
+      <div class="card rv"><h4>✅ Validation</h4><p class="muted">Inputs validated and typed at the tool boundary; outputs checked against schema and target counts.</p></div>
+    </div>
+  </section>
+
+  <!-- 11 OUTPUTS -->
+  <section class="sec" id="outputs" data-nav="The Outputs" data-grp="Results">
+    <h2 class="rv"><span class="n">11</span>The output contract — what ships</h2>
+    <div class="grid g2">
+      <div class="card rv"><span class="tag t-out">Output A</span><h4 style="margin-top:8px">🌐 Strategy &amp; due-diligence website</h4>
+        <ul><li>27-section interactive report (Exec → PESTLE/SWOT/Porter → competitors → workflows → roadmap → KPIs)</li>
+        <li>Companion pages: <a href="ai-build-playbook.html">AI Build Playbook</a>, <a href="profit-estimator.html">Profit Estimator</a>, <a href="owner-faq.html">Owner Q&amp;A</a>, <a href="odoo-sales.html">Odoo Platform</a>, <a href="odoo-demo-guide.html">Demo Walkthrough</a>, <a href="staff-guides.html">Staff Guides</a>, <a href="stakeholder-questions.html">Discovery Questions</a></li>
+        <li>Charts, BPMN swimlanes, org charts, real photos</li>
+        <li>Self-contained, installable PWA, offline, mobile-clean (0 overflow @390px), dark/light</li>
+        <li>Deployed to GitHub Pages</li></ul>
+      </div>
+      <div class="card rv"><span class="tag t-out">Output B</span><h4 style="margin-top:8px">🏨 Live, demo-ready Odoo 19 ERP</h4>
+        <ul><li>Apps installed &amp; configured (Accounting/<code>l10n_ph</code>, Sales, POS+Restaurant, Inventory, CRM, HR, Project, Maintenance, Website/eCommerce)</li>
+        <li><b>Hotel industry module</b>: rooms, Schedule Gantt, Orders, Housekeeping board, booking website</li>
+        <li>Rich demo data: customers, employees, products/rooms (real photos), seasonal bookings, POS + kitchen tickets, invoices, CRM</li>
+        <li>Operational AI/automation layer wired (concierge, pricing, dive briefing, guards)</li>
+        <li>Public URLs live (shop / booking / backend)</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 OPERATIONAL AI -->
+  <section class="sec" id="opsai" data-nav="Operational AI Agents" data-grp="Results">
+    <h2 class="rv"><span class="n">12</span>The operational AI layer it leaves behind</h2>
+    <p class="lead rv">Beyond building the ERP, the engine wires the resort's <em>own</em> always-on AI agents on top of the Odoo data — each its own loop, each governed by an approval policy. (Full loops shown in §4.)</p>
+    <div class="grid g3" id="opsCards"></div>
+  </section>
+
+  <!-- 13 PROOF -->
+  <section class="sec" id="proof" data-nav="Proof — this engagement" data-grp="Results">
+    <h2 class="rv"><span class="n">13</span>Proof — this engagement was built this way</h2>
+    <p class="lead rv">The Black Box is not a concept slide. The Casa Escondida deliverables you're looking at <em>are</em> its output.</p>
+    <div class="stats">
+      <div class="stat rv"><div class="v" data-target="27">0</div><div class="l">report sections + 7 companions</div></div>
+      <div class="stat rv"><div class="v" data-target="24">0</div><div class="l">rooms, real photos &amp; schedule</div></div>
+      <div class="stat rv"><div class="v" data-target="2000" data-suffix="+">0</div><div class="l">POS orders generated</div></div>
+      <div class="stat rv"><div class="v" data-target="0">0</div><div class="l">console errors / overflow @390px</div></div>
+    </div>
+    <div class="callout rv"><strong>Same engine, different client.</strong> Swap the five inputs — a new brief, a new instance, a different Drive, a different company &amp; team — and the Black Box produces the equivalent website + live ERP for that business. The Casa Escondida run is the reference implementation.</div>
+  </section>
+
+  <!-- 14 HOW TO RUN -->
+  <section class="sec" id="run" data-nav="How to Run It" data-grp="Results">
+    <h2 class="rv"><span class="n">14</span>How to run it</h2>
+    <p class="lead rv">Driven inside Claude Code: background <code>Agent</code> tasks for each specialist, the <code>/loop</code> skill for verification cadence, and an Odoo MCP server (or XML-RPC) for the build.</p>
+    <div class="grid g3">
+      <div class="card rv"><h4>1 · Connect</h4><p class="muted">Attach the Odoo MCP / credentials + the Google Drive connector. Hand the Orchestrator the brief, company name &amp; personnel.</p></div>
+      <div class="card rv"><h4>2 · Dispatch &amp; loop</h4><p class="muted">Orchestrator launches stage agents; <code>/loop</code> re-runs each stage's verification and advances only on green.</p></div>
+      <div class="card rv"><h4>3 · Approve &amp; ship</h4><p class="muted">Approve the gated steps (pricing, comms, resets); the engine commits, deploys and leaves the Odoo demo live.</p></div>
+    </div>
+    <p class="note rv" style="margin-top:14px">Specs: <a href="agents/orchestration.md">agents/orchestration.md</a> · <code>odoo-build-spec/mcp-runbook.md</code> · <code>odoo-build-spec/automations.json</code> · engineering detail in the <a href="ai-build-playbook.html">AI Build Playbook</a>.</p>
+  </section>
+
+  <!-- 15 GLOSSARY -->
+  <section class="sec" id="glossary" data-nav="Glossary" data-grp="Results">
+    <h2 class="rv"><span class="n">15</span>Glossary</h2>
+    <div class="tbl-wrap rv"><table>
+      <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+      <tbody id="glossRows"></tbody>
+    </table></div>
+  </section>
+
+  <div class="foot note">Casa Escondida Anilao × Technext · The Black Box — autonomous engagement engine · <a href="index.html">back to the report</a></div>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const INPUTS=[
+ {id:'instructions',t:'1 · Instructions — the brief',icon:'📋',sec:false,
+  desc:'Free-text goals + scope + tone + hard constraints.',
+  bullets:['Objective ("sell an Odoo overhaul", "due-diligence pack", "investor teaser")','Deliverable scope &amp; depth, audience, language(s)','Guardrails: what must NOT appear (e.g. "no peso valuation estimates")','Section emphasis &amp; ordering preferences'],
+  ex:'brief.md → "Build a max-comprehensive due-diligence site + live Odoo demo for a PADI dive resort; no peso valuations; mobile-clean."',
+  val:'Plain language; iteratively refinable; parsed by the Orchestrator into a run plan.'},
+ {id:'creds',t:'2 · Odoo credentials — the build target',icon:'🔑',sec:true,
+  desc:'Where the live demo gets built. Handled as a runtime secret.',
+  bullets:['<b>url</b> — instance, e.g. <code>https://acme.odoo.com</code>','<b>db</b> — database name','<b>api_key</b> / login — XML-RPC / MCP at runtime only','Optional: which apps/industries to activate (e.g. Hotel)'],
+  ex:'env: ODOO_URL, ODOO_DB, ODOO_KEY (never echoed, never committed)',
+  val:'Secret — env/MCP config only; rotate after the run.'},
+ {id:'drive',t:'3 · Google Drive — company material',icon:'🗂',sec:false,
+  desc:'A shared folder the engine reads via the Drive connector.',
+  bullets:['<b>Photos</b> — rooms, property, dive/site shots → product images, hero/media','<b>Ads / marketing instructions</b> — campaigns, offers, channels → Growth sections + CRM/marketing setup','<b>Company data</b> — rate cards, menus, rosters, financial notes, decks','<b>Brand kit</b> — logo, colours, fonts'],
+  ex:'Drive/ → /photos/*.jpg, /rates-2026.xlsx, /menu.pdf, /ads-plan.docx, /brand/logo.svg',
+  val:'Read-only; mixed docs/sheets/images; PII treated as secret.'},
+ {id:'name',t:'4 · Company name &amp; brand',icon:'🏷',sec:false,
+  desc:'Anchors research, branding and the company record.',
+  bullets:['Legal/trading name → company record, site title, footers','Brand assets → theme tokens, logos, favicons'],
+  ex:'"Casa Escondida Anilao Resort &amp; Dive Center"',
+  val:'Drives research seeds + res.company + site identity.'},
+ {id:'people',t:'5 · Key personnel — org &amp; identity',icon:'👥',sec:false,
+  desc:'Seeds the org/HR model and the leadership narrative.',
+  bullets:['Owners &amp; CEO-level (e.g. <em>Edwin / Evan</em>)','Department heads + self-managing structure','Named experts (instructors, GM) → org chart, hr.employee, skills'],
+  ex:'Owner: Edwin/Evan · GM/Instructor: "Dong" Vergara · 10 instructors, 6 DMs',
+  val:'Maps to Founders &amp; Leadership section + HR employees/skills.'}
+];
+
+const AGENTS=[
+ {id:'orch',ic:'🧭',nm:'Orchestrator',ro:'Conductor',orch:true,
+  mandate:'Parse the brief, plan the run, sequence stages, hold shared state &amp; created-record IDs, loop each stage until green, and escalate on hard failures or approval gates.',
+  tools:['planning','state file','sub-agent dispatch','/loop cadence'],reads:'brief, inputs, stage results',writes:'run plan, state, escalations',
+  loop:'Master loop: plan → dispatch → verify → advance (or re-kick / escalate)',done:'all stages green; build report emitted'},
+ {id:'research',ic:'🔎',nm:'Research',ro:'Due diligence',
+  mandate:'Verify the company, market, competitors and reputation from the open web + Drive material; produce the fact base (with confidence flags) every written section draws on.',
+  tools:['web search','web fetch','Drive read','RAG'],reads:'web, Drive docs',writes:'fact base + sources + confidence',
+  loop:'Corrective-RAG loop: retrieve → grade evidence → re-query if weak',done:'fact base compiled; gaps marked, not invented'},
+ {id:'content',ic:'✍️',nm:'Content',ro:'Narrative',
+  mandate:'Write the 27 report sections + companion-page copy (exec summary, PESTLE/SWOT/Porter, personas, workflows, roadmap, FAQ, sales page) honouring tone &amp; the brief\'s guardrails.',
+  tools:['fact base','brand voice','section templates'],reads:'fact base, brief',writes:'section drafts',
+  loop:'Reflection loop: draft → self-critique vs brief → revise',done:'all sections drafted &amp; mutually consistent'},
+ {id:'design',ic:'🎨',nm:'Design / Build',ro:'Frontend',
+  mandate:'Render the self-contained HTML: theme tokens, charts, BPMN/diagrams, nav, PWA and responsive layout (0 horizontal overflow target). Produces the website + this page.',
+  tools:['HTML/CSS/JS','SVG renderer','chart builder'],reads:'content drafts, assets',writes:'HTML/CSS/JS files',
+  loop:'ReAct loop: build → render → observe errors/overflow → fix',done:'renders, 0 console errors, 0 overflow @390px'},
+ {id:'asset',ic:'🖼',nm:'Asset',ro:'Media',
+  mandate:'Pull photos &amp; brand assets from Drive (and openly-licensed sources where gaps exist), process/normalise them, and wire real images into the site and the Odoo product/room records.',
+  tools:['Drive read','image fetch','image process'],reads:'Drive photos, brand kit',writes:'site media, Odoo images',
+  loop:'Fetch → validate (size/licence) → retry on failure → attach',done:'every product/room imaged with a real photo'},
+ {id:'build',ic:'🏨',nm:'Odoo Build',ro:'ERP build',
+  mandate:'Connect to the instance and run the 9-stage runbook: install apps/industries → company/tax/journals → master data → products &amp; rooms → POS &amp; booking → transactions → invoice/pay → automations → QA. Idempotent (search-before-create).',
+  tools:['Odoo MCP / XML-RPC','browser (SaaS activation)'],reads:'spec, existing records',writes:'all Odoo records',
+  loop:'Per-stage retry loop: act → verify count → fix &amp; re-create on gap',done:'counts within ±10% of demo-data targets'},
+ {id:'auto',ic:'🤖',nm:'Automation',ro:'Operational AI',
+  mandate:'Configure the resort\'s own AI/automation layer inside Odoo — concierge, dynamic pricing, dive daily-briefing, overbooking guard, review responder, upsell, win-back — as scheduled/server actions + documented external-AI hooks.',
+  tools:['Studio automations','scheduled actions','AI hooks'],reads:'Odoo models, automations.json',writes:'actions, rules, hooks',
+  loop:'Configure → dry-run trigger → confirm fired → gate live comms',done:'actions exist &amp; fire; comms gated to humans'},
+ {id:'qa',ic:'✅',nm:'QA / Verify',ro:'Quality gate',
+  mandate:'Render pages headlessly (desktop + 390px mobile), check for errors/overflow, run cross-module Odoo spot-checks, and produce the build report (counts vs. targets, deviations).',
+  tools:['headless browser','search_read','diff'],reads:'site, Odoo, targets',writes:'build report, deviations',
+  loop:'Eval loop: run full trajectory checks → flag → send back or pass',done:'all verifications green; report signed off'}
+];
+
+const LOOPS=[
+ {k:'Universal',nm:'The universal agent cycle',nodes:['🎯 Goal','🧠 Plan','🛠 Act','👀 Observe','🔁 Reflect'],
+  desc:'Every agent, at its core, runs this five-beat cycle: hold a goal, decide a next step, take an action through a tool, observe the result, and judge whether the goal is met — then loop or finish.'},
+ {k:'Master',nm:'L1 · Master orchestration loop',nodes:['📋 Plan run','🚀 Dispatch','📥 Collect','✅ Verify','⏭ Advance'],
+  desc:'The Orchestrator plans the run, dispatches the agent for the current stage, collects its result, runs the stage verification, and advances only on green — otherwise re-kicks or escalates.'},
+ {k:'Retry',nm:'L2 · Per-stage retry loop (bounded)',nodes:['🛠 Attempt','🔍 Verify','🩹 Diagnose','♻ Re-create','⛔ Escalate'],
+  desc:'Within a stage: attempt the actions, run the verification query, and if it fails, diagnose the gap and re-create the missing/!broken records. Bounded by MAX_ATTEMPTS, then escalate to a human.'},
+ {k:'ReAct',nm:'L3 · ReAct (reason + act)',nodes:['🧠 Reason','🛠 Act','👀 Observe','🧠 Reason','✔ Done?'],
+  desc:'The baseline tool-using loop inside each agent: reason about the next step, call a tool, observe the output, reason again — until the step\'s success test passes.'},
+ {k:'Reflection',nm:'L4 · Reflection / self-critique',nodes:['✍️ Produce','🔎 Critique','📝 Revise','🔎 Re-check','✔ Accept'],
+  desc:'When quality is the bottleneck (e.g. report copy), the agent grades its own output against the brief and revises before handing off — catching drift and inconsistency early.'},
+ {k:'RAG',nm:'L5 · Corrective-RAG retrieval loop',nodes:['❓ Query','📚 Retrieve','⚖ Grade','🔁 Re-query','🧾 Ground'],
+  desc:'For facts: retrieve evidence, grade whether it actually supports the claim, re-query if it\'s weak, and only then ground the statement — carrying source + confidence. Cuts hallucination on numbers and names.'},
+ {k:'Gate',nm:'L6 · Human-in-the-loop gate',nodes:['🛑 Pause','📨 Ask','🧑 Decide','✅ Proceed','📋 Log'],
+  desc:'For irreversible or outward-facing actions (price changes, destructive resets, guest comms), the loop pauses, asks a human, proceeds only on approval, and logs the decision.'},
+ {k:'Ops',nm:'L7 · Operational AI loops (always-on)',nodes:['📡 Trigger','🧠 Decide','📝 Draft','🧑 Approve?','📤 Act'],
+  desc:'The resort\'s live agents run their own loops on a schedule or event: the concierge per inbound message, the rate recommender nightly, the dive briefing at 06:30 — info auto, money &amp; comms gated.'}
+];
+
+const STAGES=[
+ {n:0,t:'Connect &amp; reset',d:'Authenticate, confirm Odoo 19, safely clear old demo data.',v:'res.company ≥1; demo counts → 0',add:{}},
+ {n:1,t:'Install modules',d:'Install apps + Hotel industry in dependency order.',v:'every tech_name installed',add:{Modules:17}},
+ {n:2,t:'Company, tax &amp; finance',d:'Company, PHP currency, 12% VAT, journals, pricelists.',v:'VAT 12% exists; accounts &gt; 50; pricelists ≥ 2',add:{}},
+ {n:3,t:'Master data',d:'Partners, OTA/agents/vendors, employees, dive sites, resources.',v:'customers ≥ 150; employees ≥ 36; depts = 8',add:{Customers:150,Employees:36}},
+ {n:4,t:'Products &amp; rooms',d:'4 room types → 24 rooms; dive/courses/gear/F&amp;B/retail.',v:'rooms = 24; product prefixes present',add:{Products:42,Rooms:24}},
+ {n:5,t:'POS &amp; booking',d:'POS configs, Room-Charge payment, appointment types.',v:'2 POS configs; Room Charge; ≥ 4 appt types',add:{}},
+ {n:6,t:'Transactions (draft)',d:'Bookings, dives, courses, rentals, ~2000 POS, CRM.',v:'sale.order ≥ 600; pos.order ≥ 1500; crm ≥ 80',add:{'Sale orders':620,'POS orders':2000,CRM:80}},
+ {n:7,t:'Confirm / invoice / pay',d:'Confirm SOs, post invoices &amp; bills, register ~80% payments.',v:'posted invoices ≥ 350; VAT report non-empty',add:{Invoices:400}},
+ {n:8,t:'Automations &amp; AI layer',d:'Scheduled/server actions + the operational AI agents.',v:'pricing / guard / review actions exist',add:{Automations:27}},
+ {n:9,t:'Final QA',d:'Cross-module spot-checks; counts vs targets; build report.',v:'all green; counts within ±10%',add:{}}
+];
+const COUNT_KEYS=['Modules','Customers','Employees','Products','Rooms','Sale orders','POS orders','Invoices','Automations','CRM'];
+
+const STACK=[
+ ['1 · Interface','Where requests enter — the brief, a webhook, chat. Normalises the ask into a goal the orchestrator can plan against.'],
+ ['2 · Orchestration','Task decomposition &amp; planning; sequences stages, dispatches workers, holds state, loops until each stage verifies.'],
+ ['3 · Tools','Strict, typed contracts for every action (Odoo MCP/XML-RPC, web, Drive, files). Narrow, well-described tools beat one do-everything tool.'],
+ ['4 · Memory &amp; retrieval','Short-term scratchpad + long-term memory + RAG over the knowledge base. Context persistence is what stops the agent "forgetting".'],
+ ['5 · Policy &amp; safety','Policy-as-code + human approvals for irreversible actions + prompt-injection defenses + data validation.'],
+ ['6 · Observability &amp; eval','Trace every step, log every write, run evals on full trajectories (tool choice + outcome) — not just the final answer.']
+];
+
+const OPS=[
+ ['💬 Guest Concierge','Omni-channel (FB/WhatsApp/Viber/IG/web), auto-translating EN ⇄ Chinese. Answers FAQs, captures leads, drafts quotes → CRM for next-day approval.','info auto · quotes human'],
+ ['🌊 Dive Daily-Briefing','06:30 cron: tides + marine weather + advisories + roster/gear → composes brief with safety flags, posts to the dive group, collects ✅ go/no-go.','auto-post · dive lead confirms'],
+ ['📈 Rate Recommender','Reads occupancy, pace &amp; seasonality; proposes pricelist moves within min/max caps.','human write-back'],
+ ['⭐ Review Responder','Drafts on-brand replies to new Google/TripAdvisor reviews from booking + sentiment context.','human send'],
+ ['🎯 Upsell &amp; Win-back','Matches guest profiles to courses/photo/F&amp;B/upgrades pre-arrival; targets lapsing divers monthly.','send threshold'],
+ ['🛟 Overbooking Guard','Every 15 min: detects overlapping reservations on the same room serial; alerts front desk.','auto-alert']
+];
+
+const GLOSS=[
+ ['Agent','An LLM given a goal, a set of tools and a loop — it decides and acts, rather than just answering.'],
+ ['Loop','The repeating cycle (reason → act → observe → reflect) an agent runs until its goal/verification is met.'],
+ ['Harness','The scaffolding around the loop — tools, memory, retrieval, policy, observability — that makes runs safe and repeatable.'],
+ ['Orchestrator','The meta-agent that plans, sequences and verifies the work of specialist agents.'],
+ ['RAG','Retrieval-Augmented Generation — feeding the model real retrieved facts instead of relying on memory.'],
+ ['MCP','Model Context Protocol — a standard way to expose tools (e.g. Odoo) to an agent.'],
+ ['ReAct','A loop pattern interleaving reasoning and tool actions.'],
+ ['Reflection','An agent critiquing and improving its own output before handing off.'],
+ ['Idempotent','Safe to run more than once — search-before-create avoids duplicate records.'],
+ ['Verification gate','A query that must pass before the orchestrator advances to the next stage.'],
+ ['Context engineering','Curating what the agent knows/sees/remembers at the moment it acts.'],
+ ['Human-in-the-loop','A pause for human approval on irreversible or outward-facing actions.'],
+ ['Goal drift','When iterative refinement wanders from the original intent — countered by re-verifying against the goal.'],
+ ['Compaction','Summarising older context when the window fills, so a long run can continue.']
+];
+
+/* ---------- render ---------- */
+function el(h){const d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild;}
+
+// input accordion
+const iacc=document.getElementById('inputAcc');
+INPUTS.forEach(i=>{
+  iacc.appendChild(el(`<div class="acc rv" id="acc-${i.id}">
+    <div class="acc-h" onclick="this.parentNode.classList.toggle('open')"><span>${i.icon} ${i.t} ${i.sec?'<span class=\"pill p-red\">secret</span>':''}</span><span class="ic">＋</span></div>
+    <div class="acc-b"><p class="muted">${i.desc}</p><ul>${i.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+    <div class="kvs" style="margin:6px 0"><b>example</b> · ${i.ex}</div><div class="kvs"><b>handling</b> · ${i.val}</div></div></div>`));
+});
+
+// agent topology
+const topo=document.getElementById('topo');
+AGENTS.forEach(a=>{topo.appendChild(el(`<div class="node ${a.orch?'orch':''}" data-a="${a.id}" onclick="selAgent('${a.id}')"><div class="ic">${a.ic}</div><div class="ro">${a.ro}</div><div class="nm">${a.nm}</div></div>`));});
+function selAgent(id){
+  const a=AGENTS.find(x=>x.id===id);
+  document.querySelectorAll('.node').forEach(n=>n.classList.toggle('sel',n.dataset.a===id));
+  document.getElementById('agentDetail').innerHTML=`<div class="card adetail">
+    <div><h3 style="margin-bottom:2px">${a.ic} ${a.nm}</h3><div class="ro" style="color:var(--aqua);font-size:.72rem;text-transform:uppercase;font-weight:700;margin-bottom:8px">${a.ro}</div>
+    <p style="color:var(--ink2);font-size:.9rem">${a.mandate}</p>
+    <div class="taglist" style="margin-top:8px"><b style="font-size:.72rem;color:var(--muted)">TOOLS</b><br>${a.tools.map(t=>`<span>${t}</span>`).join('')}</div></div>
+    <div><div class="kv"><b>reads</b><span>${a.reads}</span></div><div class="kv"><b>writes</b><span>${a.writes}</span></div>
+    <div class="kv"><b>loop</b><span>${a.loop}</span></div><div class="kv"><b>done&nbsp;when</b><span>${a.done}</span></div></div></div>`;
+}
+selAgent('orch');
+
+// loop tabs + cards
+const lt=document.getElementById('loopTabs');
+LOOPS.forEach((l,i)=>lt.appendChild(el(`<button class="tab ${i===0?'on':''}" data-l="${i}" onclick="setLoop(${i})">${l.k}</button>`)));
+const lc=document.getElementById('loopCards');
+LOOPS.slice(1).forEach(l=>lc.appendChild(el(`<div class="card"><h4>${l.nm}</h4><p class="muted" style="font-size:.85rem">${l.desc}</p><div class="kvs" style="margin-top:6px">${l.nodes.join(' → ')}</div></div>`)));
+
+let curLoop=0,loopStep=0,loopTimer=null;
+const dot=document.getElementById('dot'),ring=document.getElementById('ring');
+function placeNodes(){
+  ring.querySelectorAll('.lnode').forEach(n=>n.remove());
+  const nodes=LOOPS[curLoop].nodes,N=nodes.length,R=110,cx=140,cy=140;
+  nodes.forEach((tx,i)=>{
+    const ang=(-90+i*360/N)*Math.PI/180;
+    const x=cx+R*Math.cos(ang),y=cy+R*Math.sin(ang);
+    const n=el(`<div class="lnode" data-i="${i}" style="left:${x}px;top:${y-16}px">${tx}</div>`);
+    ring.appendChild(n);
+  });
+  updLoopActive();
+}
+function updLoopActive(){
+  ring.querySelectorAll('.lnode').forEach(n=>n.classList.toggle('act',+n.dataset.i===loopStep));
+  const nodes=LOOPS[curLoop].nodes,N=nodes.length,R=110,cx=140,cy=140;
+  const ang=(-90+loopStep*360/N)*Math.PI/180;
+  dot.setAttribute('cx',cx+R*Math.cos(ang));dot.setAttribute('cy',cy+R*Math.sin(ang));
+}
+function setLoop(i){curLoop=i;loopStep=0;document.querySelectorAll('#loopTabs .tab').forEach(t=>t.classList.toggle('on',+t.dataset.l===i));
+  document.getElementById('loopName').textContent=LOOPS[i].nm;document.getElementById('loopDesc').innerHTML=LOOPS[i].desc;placeNodes();}
+function stepLoop(){loopStep=(loopStep+1)%LOOPS[curLoop].nodes.length;updLoopActive();}
+function playLoop(){if(loopTimer)return;document.getElementById('playBtn').textContent='▶ Playing…';loopTimer=setInterval(stepLoop,850);}
+function stopLoop(){clearInterval(loopTimer);loopTimer=null;document.getElementById('playBtn').textContent='▶ Play';}
+setLoop(0);
+
+// runbook rows
+const rb=document.getElementById('runbookRows');
+STAGES.forEach(s=>rb.appendChild(el(`<tr><td><b>${s.n}</b></td><td><b>${s.t}</b></td><td>${s.d}</td><td><span class="kvs">${s.v}</span></td></tr>`)));
+
+// stack
+const sl=document.getElementById('stackList');
+STACK.forEach(([n,p])=>sl.appendChild(el(`<div class="layer"><div class="ln">${n}</div><p>${p}</p></div>`)));
+
+// ops cards
+const oc=document.getElementById('opsCards');
+OPS.forEach(([t,d,ap])=>oc.appendChild(el(`<div class="card rv"><h4>${t}</h4><p class="muted" style="font-size:.85rem">${d}</p><div class="kvs" style="margin-top:6px"><b>approval</b> · ${ap}</div></div>`)));
+
+// gloss
+const gr=document.getElementById('glossRows');
+GLOSS.forEach(([t,d])=>gr.appendChild(el(`<tr><td><b>${t}</b></td><td>${d}</td></tr>`)));
+
+// stage list + counts
+const stageList=document.getElementById('stageList'),countGrid=document.getElementById('countGrid');
+STAGES.forEach(s=>stageList.appendChild(el(`<div class="stage" id="st-${s.n}"><div class="sn">${s.n}</div><div><h4>${s.t}</h4><div class="sd">${s.d}</div><div class="sv">✓ ${s.v}</div></div></div>`)));
+const counts={};COUNT_KEYS.forEach(k=>{counts[k]=0;countGrid.appendChild(el(`<div class="cnt"><div class="cv" id="cnt-${k.replace(/\s/g,'')}">0</div><div class="cl">${k}</div></div>`));});
+
+/* ---------- simulator ---------- */
+let simIdx=-1,simTimer=null;
+function logLine(t,cls){const l=document.getElementById('simLog');l.appendChild(el(`<div class="${cls||''}">${t}</div>`));l.scrollTop=l.scrollHeight;}
+function setProg(){document.getElementById('simProg').style.width=((simIdx+1)/STAGES.length*100)+'%';
+  document.getElementById('simStatus').textContent=simIdx>=STAGES.length-1?'Build complete — all stages green ✓':`Stage ${simIdx+1} of ${STAGES.length-1} ${simIdx<0?'':'· running'}`;}
+function bump(k,by){const id='cnt-'+k.replace(/\s/g,'');const e=document.getElementById(id);if(!e)return;const start=counts[k];counts[k]+=by;const end=counts[k];let t0=null;function step(ts){if(!t0)t0=ts;const p=Math.min((ts-t0)/500,1);e.textContent=Math.round(start+(end-start)*p).toLocaleString();if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+function simNext(){
+  if(simIdx>=STAGES.length-1)return;
+  simIdx++;const s=STAGES[simIdx];const node=document.getElementById('st-'+s.n);
+  node.classList.add('run');node.scrollIntoView({block:'nearest',behavior:'smooth'});
+  logLine(`› stage ${s.n} — ${s.t.replace(/&amp;/g,'&')} …`);
+  setProg();
+  setTimeout(()=>{
+    Object.entries(s.add).forEach(([k,v])=>bump(k,v));
+    node.classList.remove('run');node.classList.add('done');
+    logLine(`  ✓ verified: ${s.v.replace(/&amp;/g,'&').replace(/&gt;/g,'>')}`,'ok');
+    if(s.n===8)logLine('  ⏸ gate: pricing &amp; guest-comms automations queued for human approval','gate');
+    if(simIdx>=STAGES.length-1){logLine('› BUILD COMPLETE — website + live Odoo demo ready ✓','ok');document.getElementById('simNextBtn').disabled=true;}
+  },650);
+}
+function simAuto(){if(simTimer){clearInterval(simTimer);simTimer=null;document.getElementById('simAutoBtn').textContent='▶ Auto-run';return;}
+  document.getElementById('simAutoBtn').textContent='⏸ Pause';
+  simTimer=setInterval(()=>{if(simIdx>=STAGES.length-1){clearInterval(simTimer);simTimer=null;document.getElementById('simAutoBtn').textContent='▶ Auto-run';return;}simNext();},1100);}
+function simReset(){simIdx=-1;if(simTimer){clearInterval(simTimer);simTimer=null;document.getElementById('simAutoBtn').textContent='▶ Auto-run';}
+  COUNT_KEYS.forEach(k=>{counts[k]=0;const e=document.getElementById('cnt-'+k.replace(/\s/g,''));if(e)e.textContent='0';});
+  STAGES.forEach(s=>{const n=document.getElementById('st-'+s.n);n.classList.remove('run','done');});
+  document.getElementById('simLog').innerHTML='<div>› build run reset — ready.</div>';
+  document.getElementById('simNextBtn').disabled=false;setProg();}
+setProg();
+
+/* ---------- input flow highlight ---------- */
+const FLOWMAP={instructions:'Sets scope, tone &amp; guardrails → consumed by Orchestrator + Content.',creds:'Authenticates the build → all Odoo records (the live demo).',drive:'Photos → media &amp; product images; ads → Growth + CRM; data → catalog/menus/org.',name:'Company record, site title, branding &amp; favicons.',people:'Founders &amp; Leadership section + HR employees, skills &amp; org chart.'};
+document.querySelectorAll('.chip[data-in]').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('hot'));
+    c.classList.add('hot');document.querySelectorAll('.flow-col .chip[data-out]').forEach(o=>o.classList.add('hot'));
+    document.getElementById('flowHint').innerHTML='<b>'+c.textContent.trim()+'</b> → '+FLOWMAP[c.dataset.in];
+  });
+});
+
+/* ---------- nav, progress, reveal, theme, countup ---------- */
+const secnav=document.getElementById('secnav');
+const groups={};document.querySelectorAll('section[data-nav]').forEach(s=>{const g=s.dataset.grp||'';(groups[g]=groups[g]||[]).push(s);});
+let nh='';for(const g in groups){if(g)nh+=`<div class="gh">${g}</div>`;groups[g].forEach(s=>nh+=`<a href="#${s.id}">${s.dataset.nav}</a>`);}secnav.innerHTML=nh;
+function toggleNav(){secnav.classList.toggle('open');}
+secnav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>secnav.classList.remove('open')));
+document.addEventListener('click',e=>{if(!secnav.contains(e.target)&&!e.target.closest('[onclick="toggleNav()"]')&&!/Sections/.test(e.target.textContent||''))secnav.classList.remove('open');});
+
+function toggleTheme(){const h=document.documentElement;const l=h.getAttribute('data-theme')==='light';h.setAttribute('data-theme',l?'dark':'light');
+  document.getElementById('logo').style.filter=l?'none':'invert(1) brightness(.3)';}
+
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;document.getElementById('prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+  let cur='';document.querySelectorAll('section[data-nav]').forEach(s=>{if(s.getBoundingClientRect().top<140)cur=s.id;});
+  secnav.querySelectorAll('a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+});
+
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');
+  if(e.target.querySelector&&e.target.classList.contains('stat')){const v=e.target.querySelector('.v');if(v&&!v.dataset.done)countUp(v);}
+  io.unobserve(e.target);}});},{threshold:.18});
+document.querySelectorAll('.rv').forEach(x=>io.observe(x));
+function countUp(elm){elm.dataset.done=1;const tgt=+elm.dataset.target,suf=elm.dataset.suffix||'';let t0=null;
+  function step(ts){if(!t0)t0=ts;const p=Math.min((ts-t0)/1100,1);const ease=1-Math.pow(1-p,3);
+    elm.textContent=Math.round(tgt*ease).toLocaleString()+(p===1?suf:'');if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+</script>
+</body>
+</html>

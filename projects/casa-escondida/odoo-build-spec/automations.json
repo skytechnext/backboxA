@@ -1,13 +1,34 @@
 {
-  "native": [
-    {"name": "Dynamic Pricing", "model": "ir.cron", "kind": "scheduled"},
-    {"name": "Overbooking Guard", "model": "ir.cron", "kind": "scheduled"},
-    {"name": "Review Request", "model": "ir.cron", "kind": "scheduled"},
-    {"name": "Daily Revenue Digest", "model": "ir.cron", "kind": "scheduled"},
-    {"name": "Low-Stock Reorder", "model": "ir.cron", "kind": "scheduled"}
+  "$schema": "internal://casa-escondida/odoo19-build/automations",
+  "version": "1.0",
+  "note": "native = Odoo Studio automation / scheduled action / server action. ai = external AI agent via MCP/API writing back to Odoo (human-approved where it changes price/sends external comms).",
+
+  "native_automations": [
+    {"id": "A01", "name": "Post-stay review request", "model": "sale.order", "trigger": "checkout date + 1 day", "action": "email guest with Google/TripAdvisor links", "impact": "high", "effort": "low"},
+    {"id": "A02", "name": "Pre-arrival info + dive-medical reminder", "trigger": "arrival - 3 days", "action": "email pack + Sign waiver link", "impact": "med", "effort": "low"},
+    {"id": "A03", "name": "Booking confirmation + folio open", "trigger": "sale.order confirmed", "action": "confirmation email, open folio", "impact": "med", "effort": "low"},
+    {"id": "A04", "name": "Overbooking guard", "trigger": "scheduled every 15 min", "action": "detect overlapping reservations on same room serial; alert front desk", "impact": "high", "effort": "med"},
+    {"id": "A05", "name": "Dynamic seasonal pricing", "trigger": "scheduled nightly", "action": "adjust pricelist rates by occupancy & season thresholds", "impact": "high", "effort": "med", "guardrail": "min/max rate caps"},
+    {"id": "A06", "name": "Cert/insurance renewal reminders", "model": "hr.employee", "trigger": "30/7 days before expiry", "action": "notify manager + employee", "impact": "med", "effort": "low"},
+    {"id": "A07", "name": "Gear preventive-service reminder", "model": "maintenance.equipment", "trigger": "next service date approaching", "action": "create maintenance.request, block rental", "impact": "med", "effort": "low"},
+    {"id": "A08", "name": "Inventory auto-reorder", "trigger": "stock below min", "action": "create RFQ", "impact": "med", "effort": "low"},
+    {"id": "A09", "name": "Housekeeping task on checkout", "trigger": "checkout posted", "action": "create cleaning task; flag room not-ready", "impact": "low-med", "effort": "low"},
+    {"id": "A10", "name": "Occupancy/revenue threshold alert", "trigger": "real-time", "action": "notify management when occupancy crosses thresholds", "impact": "med", "effort": "low"},
+    {"id": "A11", "name": "OTA payout reconciliation flag", "trigger": "payment import", "action": "match OTA payout to commission bill; flag variance", "impact": "med", "effort": "med"},
+    {"id": "A12", "name": "No-show / cancellation follow-up", "trigger": "no-show flagged", "action": "apply policy, win-back email", "impact": "low-med", "effort": "low"}
   ],
-  "ai_hooks": [
-    {"name": "AI: Demand Forecast", "registered_as": "doc"},
-    {"name": "AI: Guest Sentiment", "registered_as": "doc"}
+
+  "ai_agent_automations": [
+    {"id": "AI00", "name": "Omni-channel AI concierge (FB/WhatsApp/Viber/IG/Web)", "io": "inbound message on any channel -> auto-translate (EN/Simplified+Traditional Chinese) -> answer FAQ -> capture lead -> log to Odoo CRM for next-day staff approval", "impact": "high", "effort": "high", "approval": "info auto; bookings/quotes queued for staff approval next day", "note": "Directly from discovery: Andrew to provide chatbot FAQs; replaces manual multi-channel handling by reservations."},
+    {"id": "AI0D", "name": "Dive Shop Daily Briefing", "io": "06:30 cron -> pull tides+marine weather+local advisories + read Odoo roster/gear/maintenance -> AI composes brief + safety flags -> post to FB/WhatsApp/Viber group -> collect ✅ confirmations -> log back to Odoo", "impact": "high", "effort": "med", "approval": "auto-post; go/no-go confirmed by dive lead", "note": "Fixes the discovery #1 pain: broken, unaccountable group-chat dive comms."},
+    {"id": "AI01", "name": "AI guest concierge chatbot", "io": "web/FB message -> create crm.lead / quotation via MCP", "impact": "high", "effort": "high", "approval": "auto for info, human for quotes over threshold"},
+    {"id": "AI02", "name": "Dynamic rate recommendation", "io": "reads bookings/occupancy/season -> proposes pricelist updates", "impact": "high", "effort": "high", "approval": "human write-back"},
+    {"id": "AI03", "name": "AI review-response drafting", "io": "new review -> drafts reply from booking + sentiment context", "impact": "med", "effort": "med", "approval": "human send"},
+    {"id": "AI04", "name": "Demand forecasting & staffing optimiser", "io": "history+season -> staffing & boat plan", "impact": "high", "effort": "high", "approval": "manager review"},
+    {"id": "AI05", "name": "Dive-buddy / boat-fill matching", "io": "daily manifest -> match solo divers/photographers by level/site/date", "impact": "med", "effort": "med"},
+    {"id": "AI06", "name": "Upsell engine", "io": "guest profile -> recommend courses/photo/F&B/upgrades", "impact": "high", "effort": "med"},
+    {"id": "AI07", "name": "Photo-gallery delivery", "io": "post-dive photos -> Documents + guest share link", "impact": "med", "effort": "med"},
+    {"id": "AI08", "name": "Churn-risk / win-back targeting", "io": "monthly CRM scan -> target lapsing guests", "impact": "med", "effort": "med"},
+    {"id": "AI09", "name": "Weather-aware dive scheduling", "io": "forecast -> suggest site/time changes", "impact": "med", "effort": "med"}
   ]
 }

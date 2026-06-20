@@ -1,9 +1,15 @@
 {
   "name": "casa-escondida",
-  "display_name": "Casa Escondida Anilao",
+  "display_name": "Casa Escondida Anilao Resort & Dive Center",
   "locale": "Asia/Manila",
   "currency": "PHP",
+  "extra_currencies": ["USD"],
   "odoo_version": 19,
+  "country": "Philippines",
+  "localization": "l10n_ph",
+  "vat_rate": 0.12,
   "deliverables": ["odoo", "site"],
-  "industry": "resort-dive"
+  "industry": "resort-dive",
+  "instance": "edu-escondida.odoo.com",
+  "source": "Reconstructed from skytechnext/full1 odoo-build-spec (authoritative)."
 }

@@ -1,13 +1,100 @@
 {
-  "naming_conventions": {
-    "product_default_code": "<PREFIX>-<seq>",
-    "room_lot": "STD-01",
-    "sale_order_ref": "CE-<channel>-<seq>"
+  "$schema": "internal://casa-escondida/odoo19-build/data-model",
+  "version": "1.0",
+  "note": "Per-module model & field maps. 'odoo_model' = the technical model an MCP agent creates/writes. Studio (x_) fields must be created before referenced.",
+
+  "company_setup": {
+    "res.company": {"name": "Casa Escondida Anilao Resort & Dive Center", "currency_id": "PHP"},
+    "res.currency": ["PHP (base)", "USD active", "EUR active"],
+    "account.tax": [
+      {"name": "VAT 12% (Sales)", "amount": 12.0, "type_tax_use": "sale", "default_code": "TAX-S12"},
+      {"name": "Input VAT 12%", "amount": 12.0, "type_tax_use": "purchase", "default_code": "TAX-P12"},
+      {"name": "VAT Exempt", "amount": 0.0, "type_tax_use": "sale", "default_code": "TAX-EX"}
+    ],
+    "account_chart": "l10n_ph",
+    "product.pricelist": [
+      {"name": "Peak (Nov-May)", "default_code": "PL-PEAK"},
+      {"name": "Off-Peak (Jun-Oct)", "default_code": "PL-OFF"}
+    ]
   },
-  "models": {
-    "res.partner": {"studio_fields": ["persona"]},
-    "product.room": {"fields": ["name", "default_code", "room_type"]},
-    "dive.site": {"fields": ["name"]},
-    "account.move": {"key": "ref", "move_types": ["out_invoice", "in_invoice"]}
+
+  "rooms_reservations": {
+    "decision": "Rooms = serial-tracked Rental products. No native PMS.",
+    "product.template": [
+      {"name": "Standard Room (18sqm)", "type": "service", "rent_ok": true, "tracking": "serial", "default_code": "ROOM-STD"},
+      {"name": "Deluxe Room (40sqm)", "type": "service", "rent_ok": true, "tracking": "serial", "default_code": "ROOM-DLX"},
+      {"name": "Sea View Suite (50sqm)", "type": "service", "rent_ok": true, "tracking": "serial", "default_code": "ROOM-SVS"}
+    ],
+    "stock.lot": {"pattern": "STD-01..STD-15, DLX-01..DLX-10, SVS-01..SVS-06", "total": 31, "note": "one serial per physical room → per-unit availability blocking"},
+    "studio_fields_on_sale_order": [
+      {"name": "x_channel", "type": "selection", "values": ["Website", "Booking.com", "Agoda", "TripAdvisor", "Walk-in", "Direct", "Agent"]},
+      {"name": "x_adults", "type": "integer"},
+      {"name": "x_children", "type": "integer"},
+      {"name": "x_meal_plan", "type": "selection", "values": ["Room only", "B&B", "Full board", "Dive package"]},
+      {"name": "x_season", "type": "selection", "values": ["Peak", "Off-peak"]}
+    ],
+    "rental_pricing": "rental.pricing per room product, base nightly rate, peak/off-peak via pricelists"
+  },
+
+  "dive_operations": {
+    "appointment.type": [
+      {"name": "Morning 2-Tank Boat Dive", "resource": "boat+guide", "capacity": "per boat"},
+      {"name": "Afternoon 1-Tank Dive"},
+      {"name": "Night Dive"},
+      {"name": "Macro Photo Special"}
+    ],
+    "dive_sites": {"model": "product.tag or custom dive.site", "count": 35, "examples": ["Cathedral", "Twin Rocks", "Mainit Muck", "Secret Bay", "Koala", "Eagle Point"]},
+    "resources": {"calendar.resource": ["Boat 1", "Boat 2", "Boat 3", "Instructor pool", "DM pool"]},
+    "dive_product": {"product.template": [{"name": "Guided Boat Dive", "default_code": "DIVE-BOAT"}, {"name": "Night Dive", "default_code": "DIVE-NIGHT"}, {"name": "Day Diver (2 dives)", "default_code": "DIVE-DAY2"}, {"name": "Nitrox Fill", "default_code": "CONS-NITROX"}]}
+  },
+
+  "courses": {
+    "products": [
+      {"name": "Discover Scuba Diving", "default_code": "COURSE-DSD"},
+      {"name": "Open Water Diver", "default_code": "COURSE-OW"},
+      {"name": "Advanced Open Water", "default_code": "COURSE-AOW"},
+      {"name": "Rescue Diver", "default_code": "COURSE-RESCUE"},
+      {"name": "Enriched Air / Nitrox", "default_code": "COURSE-NITROX"},
+      {"name": "Digital U/W Photography", "default_code": "COURSE-PHOTO"},
+      {"name": "Divemaster", "default_code": "COURSE-DM"}
+    ],
+    "event.event": "one per running cohort; registrations = attendees",
+    "project.project": "one per cohort; tasks = sessions/skill checkpoints; milestone = certification",
+    "sign + documents": "waiver/medical gate before sessions; C-card stored on completion"
+  },
+
+  "gear_inventory": {
+    "product.template_rental_serial": [
+      {"name": "BCD", "default_code": "GEAR-BCD", "tracking": "serial"},
+      {"name": "Regulator", "default_code": "GEAR-REG", "tracking": "serial"},
+      {"name": "Wetsuit", "default_code": "GEAR-WET", "tracking": "serial"},
+      {"name": "Dive Computer", "default_code": "GEAR-DC", "tracking": "serial"},
+      {"name": "U/W Camera Rig", "default_code": "GEAR-CAM", "tracking": "serial"}
+    ],
+    "serial_units": {"count": "80-120", "note": "multiple sizes/units per type"},
+    "consumables": ["Air fill", "Nitrox fill", "Weights"],
+    "retail": ["Masks", "Fins", "Batteries", "Memory cards", "Apparel"],
+    "maintenance_link": "each serial gear unit linked to maintenance.equipment for service plans"
+  },
+
+  "restaurant_pos": {
+    "pos.config": [
+      {"name": "Restaurant", "module": "pos_restaurant", "floors": ["Open-air dining", "Beachfront", "Bar"], "tables": 20},
+      {"name": "Dive Shop Retail", "floors": []}
+    ],
+    "payment_methods": ["Cash", "Card", "Room Charge (posts to guest sale.order/invoice)"],
+    "menu_categories": ["Breakfast", "Filipino", "International", "BBQ", "Buffet", "Beverages", "Bar"]
+  },
+
+  "hr": {
+    "hr.department": ["Dive (Instructors)", "Divemasters", "Boat Crew", "Kitchen", "Bar/Servers", "Housekeeping", "Front Desk", "Admin"],
+    "hr.employee": {"count": 30},
+    "hr_skills": "PADI ratings, EFR, insurance as skills; renewal dates → reminders",
+    "documents": "cert scans, contracts"
+  },
+
+  "maintenance": {
+    "maintenance.equipment_category": ["Dive gear", "Compressor/Nitrox", "Boats/Engines", "Facility (AC/Pool/Generator)"],
+    "preventive_plans": ["Regulators annual", "Compressor filters quarterly", "Boat engine service", "AC/pool routine"]
   }
 }
